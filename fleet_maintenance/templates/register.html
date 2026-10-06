@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <title>Create Account — Fleet Maintenance</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><text y='20' font-size='20'>&#128666;</text></svg>">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="auth">
+
+<svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-truck" viewBox="0 0 24 24">
+        <path d="M14 17V5a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h1" />
+        <path d="M14 9h3.5l3.5 3.5V16a1 1 0 0 1-1 1h-1" />
+        <circle cx="6.5" cy="17.5" r="1.8" />
+        <circle cx="17" cy="17.5" r="1.8" />
+    </symbol>
+    <symbol id="i-user" viewBox="0 0 24 24">
+        <circle cx="12" cy="8.5" r="3.5" />
+        <path d="M5 20a7 7 0 0 1 14 0" />
+    </symbol>
+    <symbol id="i-clipboard" viewBox="0 0 24 24">
+        <path d="M9 4h6v3H9z" />
+        <path d="M15 5.5h2.5A1.5 1.5 0 0 1 19 7v12.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 19.5V7a1.5 1.5 0 0 1 1.5-1.5H9" />
+        <path d="M8.5 12.5l2 2 4-4" />
+    </symbol>
+    <symbol id="i-wrench" viewBox="0 0 24 24">
+        <path d="M15.5 3.5a5.5 5.5 0 0 0-5 8.3L4 18.3a2 2 0 1 0 2.8 2.8l6.4-6.4a5.5 5.5 0 0 0 6.6-7.1l-3 3-2.6-.6-.6-2.6 3-3a5.5 5.5 0 0 0-1.1-.4z" />
+    </symbol>
+    <symbol id="i-alert-circle" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7.5v5.5" />
+        <circle cx="12" cy="16.3" r="0.9" />
+    </symbol>
+</svg>
+
+<div class="auth__inner">
+
+    <aside class="auth__aside">
+
+        <div class="auth__brand">
+            <span class="auth__mark">
+                <svg class="icon" aria-hidden="true"><use href="#i-truck"></use></svg>
+            </span>
+            FleetMaintenance
+        </div>
+
+        <h2>Join the fleet team.</h2>
+
+        <p>Create an account to report a vehicle or work through the maintenance queue.</p>
+
+        <ul class="auth__list">
+            <li>
+                <svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg>
+                Your role decides what you see in the app.
+            </li>
+            <li>
+                <svg class="icon" aria-hidden="true"><use href="#i-clipboard"></use></svg>
+                Drivers file inspection requests.
+            </li>
+            <li>
+                <svg class="icon" aria-hidden="true"><use href="#i-wrench"></use></svg>
+                Mechanics accept and complete repairs.
+            </li>
+        </ul>
+
+    </aside>
+
+    <section class="auth__form">
+
+        <h1>Create account</h1>
+        <p class="subtitle">It takes less than a minute.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="alert alert--{{ category }}">
+                    <svg class="icon" aria-hidden="true">
+                        <use href="#{{ 'i-check-circle' if category == 'success' else 'i-alert-circle' }}"></use>
+                    </svg>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST">
+
+            <div class="field">
+                <label for="name">Full name</label>
+                <input id="name" type="text" name="name" placeholder="Jane Doe"
+                       autocomplete="name" autofocus required>
+            </div>
+
+            <div class="field">
+                <label for="username">Username</label>
+                <input id="username" type="text" name="username" placeholder="jane.doe"
+                       autocomplete="username" required>
+            </div>
+
+            <div class="field">
+                <label for="password">Password</label>
+                <input id="password" type="password" name="password" placeholder="••••••••"
+                       autocomplete="new-password" required>
+                <p class="hint">Use at least 8 characters.</p>
+            </div>
+
+            <div class="field">
+                <label for="role">Account type</label>
+                <select id="role" name="role" required>
+                    <option value="">Select a role</option>
+                    <option value="driver">Truck Driver</option>
+                    <option value="mechanic">Mechanic</option>
+                </select>
+            </div>
+
+            <button class="btn btn--primary" type="submit">Create account</button>
+
+        </form>
+
+        <p class="auth__foot">
+            Already registered?
+            <a href="{{ url_for('login') }}">Sign in</a>
+        </p>
+
+    </section>
+
+</div>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+
+</body>
+
+</html>

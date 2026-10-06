@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Vehicle Inspection — Fleet Maintenance{% endblock %}
+
+{% block page_title %}Vehicle inspection request{% endblock %}
+{% block page_subtitle %}
+    Describe the problem and the maintenance team will pick it up.
+{% endblock %}
+
+{% block page_actions %}
+    <a class="btn btn--ghost" href="{{ url_for('requests') }}">
+        <svg class="icon" aria-hidden="true"><use href="#i-list"></use></svg>
+        My requests
+    </a>
+{% endblock %}
+
+{% block content %}
+
+<div class="panel" style="max-width: 760px; margin-top: 0;">
+
+    {% if not truck %}
+        <div class="alert alert--error">
+            <svg class="icon" aria-hidden="true"><use href="#i-alert-circle"></use></svg>
+            <span>No truck is assigned to your account yet. Ask an administrator to link
+                your vehicle before submitting a request.</span>
+        </div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+
+        <div class="truck-strip">
+            <div class="truck-strip__cell">
+                <span>Truck</span>
+                <strong class="{{ 'is-missing' if not truck }}">
+                    {{ truck['truck_number'] if truck else 'Not assigned' }}
+                </strong>
+            </div>
+            <div class="truck-strip__cell">
+                <span>Plate number</span>
+                <strong class="{{ 'is-missing' if not truck }}">
+                    {{ truck['plate_number'] if truck else '—' }}
+                </strong>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="date">Inspection date</label>
+            <input id="date" type="date" name="date" data-today required>
+        </div>
+
+        <div class="field">
+            <label for="mileage">Current mileage</label>
+            <input id="mileage" type="text" name="mileage" placeholder="e.g. 45,000 km">
+            <p class="hint">Helps the mechanic judge wear and service intervals.</p>
+        </div>
+
+        <div class="field">
+            <label for="issue">Issue or inspection concern</label>
+            <textarea id="issue" name="issue" rows="5" data-counter
+                      placeholder="Describe what you noticed — what happened, and when it started."
+                      required></textarea>
+        </div>
+
+        <div class="field">
+            <label for="photo">Photo of the issue</label>
+            <input id="photo" type="file" name="photo" accept="image/*" data-preview>
+            <div class="preview" data-preview-target></div>
+            <p class="hint">Optional, but a clear photo speeds up the diagnosis.</p>
+        </div>
+
+        <button class="btn btn--primary" type="submit" {{ 'disabled' if not truck }}>
+            <svg class="icon" aria-hidden="true"><use href="#i-clipboard"></use></svg>
+            Submit inspection request
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

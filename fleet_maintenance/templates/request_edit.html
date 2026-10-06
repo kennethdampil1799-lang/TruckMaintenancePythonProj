@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Request #{{ '%04d'|format(item['id']) }} — Fleet Maintenance{% endblock %}
+
+{% block page_title %}Edit request #{{ '%04d'|format(item['id']) }}{% endblock %}
+{% block page_subtitle %}
+    Submitted by {{ driver_name }} — correct any details that were entered
+    incorrectly. Status is not changed here.
+{% endblock %}
+
+{% block page_actions %}
+    <a class="btn btn--ghost" href="{{ url_for('requests') }}">
+        <svg class="icon" aria-hidden="true"><use href="#i-list"></use></svg>
+            Back to requests
+    </a>
+{% endblock %}
+
+{% block content %}
+
+<div class="panel" style="max-width: 760px; margin-top: 0;">
+
+    <div class="truck-strip">
+        <div class="truck-strip__cell">
+            <span>Driver</span>
+            <strong>{{ driver_name }}</strong>
+        </div>
+        <div class="truck-strip__cell">
+            <span>Current status</span>
+            <strong>
+                <span class="status status--{{ item['status']|lower|replace(' ', '-') }}">
+                    {{ item['status'] }}
+                </span>
+            </strong>
+        </div>
+    </div>
+
+    {% if item['photo'] %}
+        <div class="field">
+            <label>Uploaded photo</label>
+            <div class="preview is-visible" style="margin-top: 0;">
+                <img src="{{ url_for('static', filename='uploads/' + item['photo']) }}"
+                     alt="Photo attached to this request">
+            </div>
+            <p class="hint">Uploading a new file below replaces this photo.</p>
+        </div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+
+        <div class="field">
+            <label for="truck_id">Truck</label>
+            <select id="truck_id" name="truck_id" required>
+                {% for t in trucks %}
+                    <option value="{{ t['id'] }}"
+                        {{ 'selected' if t['id'] == item['truck_id'] }}>
+                        {{ t['truck_number'] }} — {{ t['plate_number'] }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="date">Inspection date</label>
+            <input id="date" type="date" name="date"
+                   value="{{ item['date'] }}" required>
+        </div>
+
+        <div class="field">
+            <label for="mileage">Mileage</label>
+            <input id="mileage" type="text" name="mileage"
+                   value="{{ item['mileage'] or '' }}"
+                   placeholder="e.g. 45,000 km">
+        </div>
+
+        <div class="field">
+            <label for="issue">Issue description</label>
+            <textarea id="issue" name="issue" rows="5" data-counter
+                      required>{{ item['issue'] }}</textarea>
+        </div>
+
+        <div class="field">
+            <label for="photo">Replace photo</label>
+            <input id="photo" type="file" name="photo" accept="image/*" data-preview>
+            <div class="preview" data-preview-target></div>
+            <p class="hint">Optional. Leave empty to keep the current photo.</p>
+        </div>
+
+        <div class="form-actions">
+            <button class="btn btn--primary" type="submit">
+                <svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>
+                Save changes
+            </button>
+            <a class="btn btn--ghost" href="{{ url_for('requests') }}">Cancel</a>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

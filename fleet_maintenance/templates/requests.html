@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% set is_driver = session['role'] == 'driver' %}
+{% set is_mechanic = session['role'] == 'mechanic' %}
+{% set is_admin = session['role'] == 'admin' %}
+{% set col_count = 6 if is_driver else 7 %}
+
+{% block title %}Maintenance Requests — Fleet Maintenance{% endblock %}
+
+{% block page_title %}{{ 'My requests' if is_driver else 'Maintenance requests' }}{% endblock %}
+{% block page_subtitle %}
+    {% if is_driver %}
+        Every inspection request you've submitted, newest first.
+    {% elif is_mechanic %}
+        Review, accept, and close out inspection requests.
+    {% else %}
+        Full maintenance history across the fleet.
+    {% endif %}
+{% endblock %}
+
+{% block page_actions %}
+    {% if is_driver %}
+        <a class="btn" href="{{ url_for('inspection') }}">
+            <svg class="icon" aria-hidden="true"><use href="#i-clipboard"></use></svg>
+            New inspection
+        </a>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+{% if requests %}
+<div class="table-card">
+
+    <div class="table-toolbar">
+        <div class="table-toolbar__search">
+            <svg class="icon" aria-hidden="true"><use href="#i-list"></use></svg>
+            <input type="search" placeholder="Filter by truck, driver or issue…"
+                   aria-label="Filter requests" data-table-filter>
+        </div>
+        <div class="segmented" role="group" aria-label="Filter by status">
+            <button type="button" class="is-active" data-status-filter="all">All</button>
+            <button type="button" data-status-filter="pending">Pending</button>
+            <button type="button" data-status-filter="in maintenance">In progress</button>
+            <button type="button" data-status-filter="completed">Completed</button>
+            <button type="button" data-status-filter="cancelled">Cancelled</button>
+        </div>
+    </div>
+
+    <div class="table-scroll">
+
+        <table class="table--stack">
+
+            <thead>
+                <tr>
+                    <th scope="col">Ref</th>
+                    <th scope="col">Truck</th>
+                    {% if not is_driver %}<th scope="col">Driver</th>{% endif %}
+                    <th scope="col">Reported</th>
+                    <th scope="col">Issue</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for item in requests %}
+
+                <tr data-status="{{ item['status']|lower }}"
+                    data-search="{{ item['truck_number'] }} {{ item['plate_number'] }}
+                        {{ item['driver_name'] if not is_driver }} {{ item['issue'] }}">
+
+                    <td class="cell-id" data-label="Ref">#{{ '%04d'|format(item['id']) }}</td>
+
+                    <td class="cell-truck" data-label="Truck">
+                        <strong>{{ item['truck_number'] }}</strong>
+                        <span>{{ item['plate_number'] }}</span>
+                    </td>
+
+                    {% if not is_driver %}
+                        <td class="cell-driver" data-label="Driver">{{ item['driver_name'] }}</td>
+                    {% endif %}
+
+                    <td class="cell-date" data-label="Reported">{{ item['date'] }}</td>
+
+                    <td class="cell-issue" data-label="Issue">
+                        <div class="issue-wrap">
+                            {% if item['photo'] %}
+                                <img class="thumb"
+                                     src="{{ url_for('static', filename='uploads/' + item['photo']) }}"
+                                     alt="Photo for request #{{ item['id'] }}"
+                                     loading="lazy">
+                            {% endif %}
+                            <span class="cell-issue__text {{ 'is-empty' if not item['issue'] }}">
+                                {{ item['issue'] if item['issue'] else 'No description provided' }}
+                            </span>
+                        </div>
+                    </td>
+
+                    <td data-label="Status">
+                        <span class="status status--{{ item['status']|lower|replace(' ', '-') }}">
+                            {{ item['status'] }}
+                        </span>
+                    </td>
+
+                    <td data-label="Action">
+                        <div class="row-actions">
+
+                            {% if is_mechanic and item['status'] == 'Pending' %}
+
+                                <form method="POST"
+                                      action="{{ url_for('accept_request', request_id=item['id']) }}">
+                                    <button class="btn btn--sm" type="submit">
+                                        Accept job
+                                    </button>
+                                </form>
+
+                            {% elif is_mechanic and item['status'] == 'In Maintenance' %}
+
+                                <form method="POST"
+                                      action="{{ url_for('complete_request', request_id=item['id']) }}"
+                                      data-confirm="Close request #{{ '%04d'|format(item['id']) }} as completed?">
+                                    <input type="text" name="notes" placeholder="Work performed…"
+                                           aria-label="Maintenance note" required>
+                                    <button class="btn btn--sm btn--danger-soft" type="submit">
+                                        Complete
+                                    </button>
+                                </form>
+
+                            {% endif %}
+
+                            {% if is_admin %}
+
+                                <a class="btn btn--sm btn--ghost"
+                                   href="{{ url_for('edit_request', request_id=item['id']) }}">
+                                    <svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>
+                                    Edit
+                                </a>
+
+                                {% if item['status'] == 'Cancelled' %}
+
+                                    <form method="POST"
+                                          action="{{ url_for('reopen_request', request_id=item['id']) }}">
+                                        <button class="btn btn--sm" type="submit">
+                                            <svg class="icon" aria-hidden="true"><use href="#i-undo"></use></svg>
+                                            Reopen
+                                        </button>
+                                    </form>
+
+                                {% elif item['status'] != 'Completed' %}
+
+                                    <form method="POST"
+                                          action="{{ url_for('cancel_request', request_id=item['id']) }}"
+                                          data-confirm="Cancel request #{{ '%04d'|format(item['id']) }}? It will be removed from the mechanic queue.">
+                                        <button class="btn btn--sm btn--danger-ghost" type="submit">
+                                            <svg class="icon" aria-hidden="true"><use href="#i-ban"></use></svg>
+                                            Cancel
+                                        </button>
+                                    </form>
+
+                                {% endif %}
+
+                            {% endif %}
+
+                            {% if not is_admin
+                                  and not (is_mechanic
+                                           and item['status'] in ['Pending', 'In Maintenance']) %}
+                                <span class="dash">—</span>
+                            {% endif %}
+
+                        </div>
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <p class="no-match" data-no-match hidden>
+        No requests match your filters.
+    </p>
+
+</div>
+
+{% else %}
+
+<div class="panel empty">
+    <svg class="icon" aria-hidden="true"><use href="#i-clipboard"></use></svg>
+    <strong>No maintenance requests yet</strong>
+    <p>
+        {% if is_driver %}
+            When your truck needs service, submit an inspection request and it
+            will show up here.
+        {% else %}
+            Requests submitted by drivers will appear in this list.
+        {% endif %}
+    </p>
+    {% if is_driver %}
+        <a class="btn" href="{{ url_for('inspection') }}" style="margin-top: 18px;">
+            <svg class="icon" aria-hidden="true"><use href="#i-clipboard"></use></svg>
+            Submit your first request
+        </a>
+    {% endif %}
+</div>
+
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — Fleet Maintenance{% endblock %}
+
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}
+    Signed in as {{ session['role'] }} — here's where the fleet stands today.
+{% endblock %}
+
+{% block page_actions %}
+    {% if session['role'] == 'driver' %}
+        <a class="btn" href="{{ url_for('inspection') }}">
+            <svg class="icon" aria-hidden="true"><use href="#i-clipboard"></use></svg>
+            New inspection
+        </a>
+    {% else %}
+        <a class="btn" href="{{ url_for('requests') }}">
+            <svg class="icon" aria-hidden="true"><use href="#i-list"></use></svg>
+            View requests
+        </a>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="cards">
+
+    <div class="card card--brand">
+        <span class="card__icon">
+            <svg class="icon" aria-hidden="true"><use href="#i-truck"></use></svg>
+        </span>
+        <span class="card__text">
+            <span>Total trucks</span>
+            <strong>{{ total_trucks }}</strong>
+        </span>
+    </div>
+
+    <div class="card card--warn">
+        <span class="card__icon">
+            <svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg>
+        </span>
+        <span class="card__text">
+            <span>Pending</span>
+            <strong>{{ pending_requests }}</strong>
+        </span>
+    </div>
+
+    <div class="card card--info">
+        <span class="card__icon">
+            <svg class="icon" aria-hidden="true"><use href="#i-wrench"></use></svg>
+        </span>
+        <span class="card__text">
+            <span>In maintenance</span>
+            <strong>{{ maintenance_count }}</strong>
+        </span>
+    </div>
+
+    <div class="card card--ok">
+        <span class="card__icon">
+            <svg class="icon" aria-hidden="true"><use href="#i-check-badge"></use></svg>
+        </span>
+        <span class="card__text">
+            <span>Completed</span>
+            <strong>{{ completed_count }}</strong>
+        </span>
+    </div>
+
+    <div class="card card--muted">
+        <span class="card__icon">
+            <svg class="icon" aria-hidden="true"><use href="#i-ban"></use></svg>
+        </span>
+        <span class="card__text">
+            <span>Cancelled</span>
+            <strong>{{ cancelled_count }}</strong>
+        </span>
+    </div>
+
+</div>
+
+<section class="panel">
+
+    <div class="panel__head">
+        <span class="panel__icon">
+            {% if session['role'] == 'driver' %}
+                <svg class="icon" aria-hidden="true"><use href="#i-clipboard"></use></svg>
+            {% elif session['role'] == 'mechanic' %}
+                <svg class="icon" aria-hidden="true"><use href="#i-wrench"></use></svg>
+            {% else %}
+                <svg class="icon" aria-hidden="true"><use href="#i-check-badge"></use></svg>
+            {% endif %}
+        </span>
+        <h3>
+            {% if session['role'] == 'driver' %}
+                Report a vehicle problem
+            {% elif session['role'] == 'mechanic' %}
+                Work the maintenance queue
+            {% else %}
+                Monitor the fleet
+            {% endif %}
+        </h3>
+    </div>
+
+    <p>
+        {% if session['role'] == 'driver' %}
+            Submit an inspection request whenever your truck needs service.
+            Add a photo so the mechanic can diagnose the issue faster.
+        {% elif session['role'] == 'mechanic' %}
+            Review pending inspection requests, accept the jobs you will take,
+            then close them out with a maintenance note.
+        {% else %}
+            Follow every request from pending through to completed,
+            and check in on the vehicles that need attention first.
+        {% endif %}
+    </p>
+
+    <ol class="steps">
+        <li>
+            <b>Step 1 · Report</b>
+            <p>A driver logs the issue with mileage and a photo.</p>
+        </li>
+        <li>
+            <b>Step 2 · Repair</b>
+            <p>A mechanic accepts the request and performs the work.</p>
+        </li>
+        <li>
+            <b>Step 3 · Close</b>
+            <p>The job is completed and the status updates for everyone.</p>
+        </li>
+    </ol>
+
+    <a class="btn" href="{{ url_for('inspection') if session['role'] == 'driver' else url_for('requests') }}">
+        {% if session['role'] == 'driver' %}
+            Submit inspection
+        {% else %}
+            Open requests
+        {% endif %}
+        <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+    </a>
+
+</section>
+
+{% endblock %}
