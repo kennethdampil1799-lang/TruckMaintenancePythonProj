@@ -110,7 +110,7 @@
         <span class="brand__mark">
             <svg class="icon" aria-hidden="true"><use href="#i-truck"></use></svg>
         </span>
-        <span class="brand__text">Kenneth<strong>Maintenance</strong></span>
+        <span class="brand__text">Byahe<strong>Care!</strong></span>
     </a>
 
     <div class="topbar__user">
@@ -142,6 +142,7 @@
         {% if session['role'] == 'driver' %}
             {{ nav_link('inspection', 'Vehicle Inspection', 'i-clipboard') }}
             {{ nav_link('truck', 'My Truck', 'i-truck') }}
+            {{ nav_link('receipts', 'My Receipts', 'i-check-badge') }}
         {% endif %}
 
         {{ nav_link('requests',

@@ -11,7 +11,11 @@ app.secret_key = "fleet-maintenance-secret-key"
 DATABASE = "fleet.db"
 UPLOAD_FOLDER = "static/uploads"
 
+# Maximum number of photos a driver can attach to one inspection request.
+MAX_PHOTOS = 5
+
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024 * MAX_PHOTOS
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -58,6 +62,45 @@ def init_db():
             issue TEXT NOT NULL,
             photo TEXT,
             status TEXT DEFAULT 'Pending'
+        )
+    """)
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS request_photos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            request_id INTEGER NOT NULL,
+            filename TEXT NOT NULL,
+            position INTEGER NOT NULL DEFAULT 0
+        )
+    """)
+
+    # Move photos from the original single-photo column into the new table
+    legacy_photos = conn.execute("""
+        SELECT id, photo FROM inspection_requests
+        WHERE photo IS NOT NULL AND photo != ''
+    """).fetchall()
+
+    for row in legacy_photos:
+        already_moved = conn.execute("""
+            SELECT 1 FROM request_photos
+            WHERE request_id = ? AND filename = ?
+        """, (row["id"], row["photo"])).fetchone()
+
+        if not already_moved:
+            conn.execute("""
+                INSERT INTO request_photos (request_id, filename, position)
+                VALUES (?, ?, 0)
+            """, (row["id"], row["photo"]))
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS notifications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            request_id INTEGER,
+            title TEXT NOT NULL,
+            body TEXT,
+            created_at TEXT,
+            is_read INTEGER DEFAULT 0
         )
     """)
 
@@ -172,6 +215,117 @@ def save_photo(file):
     return stored
 
 
+def save_photos(files, existing_count=0):
+    """Store several uploaded images and return the saved filenames.
+
+    At most MAX_PHOTOS images are kept per request, counting the photos
+    already attached. Extra files are ignored rather than rejected, so
+    an oversized selection still submits with the first MAX_PHOTOS.
+    """
+
+    room = MAX_PHOTOS - existing_count
+
+    if room <= 0:
+        return []
+
+    saved = []
+
+    for file in files[:room]:
+        stored = save_photo(file)
+
+        if stored:
+            saved.append(stored)
+
+    return saved
+
+
+def replace_photos(conn, request_id, files):
+    """Swap a request's photos for a new upload, returning the new count."""
+
+    new_photos = save_photos(files)
+
+    if not new_photos:
+        return False
+
+    conn.execute(
+        "DELETE FROM request_photos WHERE request_id = ?",
+        (request_id,)
+    )
+
+    conn.executemany("""
+        INSERT INTO request_photos (request_id, filename, position)
+        VALUES (?, ?, ?)
+    """, [
+        (request_id, name, position)
+        for position, name in enumerate(new_photos)
+    ])
+
+    return True
+
+
+def get_photos(conn, request_id):
+    """Return the stored photo filenames for one request, in order."""
+
+    rows = conn.execute("""
+        SELECT filename FROM request_photos
+        WHERE request_id = ?
+        ORDER BY position, id
+    """, (request_id,)).fetchall()
+
+    return [row["filename"] for row in rows]
+
+
+def send_receipt(conn, request_id, notes):
+    """Create a completion receipt for the driver who filed the request.
+
+    The receipt records the truck, the work that was carried out, and the
+    date it was closed out so the driver can read it back later.
+    """
+
+    row = conn.execute("""
+        SELECT
+            inspection_requests.driver_id,
+            inspection_requests.issue,
+            trucks.truck_number,
+            trucks.plate_number
+        FROM inspection_requests
+        JOIN trucks ON inspection_requests.truck_id = trucks.id
+        WHERE inspection_requests.id = ?
+    """, (request_id,)).fetchone()
+
+    if not row:
+        return False
+
+    work = (notes or "").strip() or "No maintenance note was recorded."
+
+    conn.execute("""
+        INSERT INTO notifications
+        (user_id, request_id, title, body, created_at, is_read)
+        VALUES (?, ?, ?, ?, date('now'), 0)
+    """, (
+        row["driver_id"],
+        request_id,
+        f"Maintenance complete — {row['truck_number']}",
+        f"Your truck {row['truck_number']} "
+        f"({row['plate_number']}) has finished its maintenance.\n\n"
+        f"Reported issue: {row['issue']}\n"
+        f"Work carried out: {work}\n\n"
+        "The vehicle is ready to return to service.",
+    ))
+
+    return True
+
+
+def mark_receipts_read(conn, user_id):
+    """Mark a driver's receipts as read."""
+
+    conn.execute("""
+        UPDATE notifications
+        SET is_read = 1
+        WHERE user_id = ? AND is_read = 0
+    """, (user_id,))
+
+
 # =========================
 # LOGIN
 # =========================
@@ -268,25 +422,69 @@ def dashboard():
 
     conn = get_db()
 
-    total_trucks = conn.execute(
-        "SELECT COUNT(*) FROM trucks"
-    ).fetchone()[0]
+    # Drivers only ever see figures for their own requests, never the
+    # whole fleet's workload.
+    if session["role"] == "driver":
 
-    pending_requests = conn.execute(
-        "SELECT COUNT(*) FROM inspection_requests WHERE status = 'Pending'"
-    ).fetchone()[0]
+        scope_sql = "WHERE driver_id = ?"
+        scope_args = (session["user_id"],)
 
-    maintenance_count = conn.execute(
-        "SELECT COUNT(*) FROM inspection_requests WHERE status = 'In Maintenance'"
-    ).fetchone()[0]
+        total_trucks = conn.execute(
+            "SELECT COUNT(*) FROM trucks WHERE driver_id = ?",
+            (session["user_id"],)
+        ).fetchone()[0]
 
-    completed_count = conn.execute(
-        "SELECT COUNT(*) FROM inspection_requests WHERE status = 'Completed'"
-    ).fetchone()[0]
+    else:
 
-    cancelled_count = conn.execute(
-        "SELECT COUNT(*) FROM inspection_requests WHERE status = 'Cancelled'"
-    ).fetchone()[0]
+        scope_sql = ""
+        scope_args = ()
+
+        total_trucks = conn.execute(
+            "SELECT COUNT(*) FROM trucks"
+        ).fetchone()[0]
+
+    def status_count(status):
+        if scope_sql:
+            return conn.execute(
+                f"SELECT COUNT(*) FROM inspection_requests "
+                f"{scope_sql} AND status = ?",
+                (*scope_args, status)
+            ).fetchone()[0]
+
+        return conn.execute(
+            "SELECT COUNT(*) FROM inspection_requests WHERE status = ?",
+            (status,)
+        ).fetchone()[0]
+
+    pending_requests = status_count("Pending")
+    maintenance_count = status_count("In Maintenance")
+    completed_count = status_count("Completed")
+    cancelled_count = status_count("Cancelled")
+
+    receipts = conn.execute("""
+        SELECT
+            notifications.*,
+            trucks.truck_number,
+            trucks.plate_number
+        FROM notifications
+        LEFT JOIN inspection_requests
+        ON notifications.request_id = inspection_requests.id
+        LEFT JOIN trucks
+        ON inspection_requests.truck_id = trucks.id
+        WHERE notifications.user_id = ?
+        ORDER BY notifications.id DESC
+        LIMIT 5
+    """, (session["user_id"],)).fetchall()
+
+    unread_count = conn.execute("""
+        SELECT COUNT(*) FROM notifications
+        WHERE user_id = ? AND is_read = 0
+    """, (session["user_id"],)).fetchone()[0]
+
+    if session["role"] == "driver" and unread_count:
+        mark_receipts_read(conn, session["user_id"])
+        conn.commit()
+        unread_count = 0
 
     conn.close()
 
@@ -296,7 +494,56 @@ def dashboard():
         pending_requests=pending_requests,
         maintenance_count=maintenance_count,
         completed_count=completed_count,
-        cancelled_count=cancelled_count
+        cancelled_count=cancelled_count,
+        receipts=receipts,
+        unread_count=unread_count
+    )
+
+
+# =========================
+# DRIVER RECEIPTS
+# =========================
+
+@app.route("/receipts")
+def receipts():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if session["role"] != "driver":
+        flash("Only drivers have maintenance receipts.", "error")
+        return redirect(url_for("dashboard"))
+
+    conn = get_db()
+
+    receipts = conn.execute("""
+        SELECT
+            notifications.*,
+            trucks.truck_number,
+            trucks.plate_number
+        FROM notifications
+        LEFT JOIN inspection_requests
+        ON notifications.request_id = inspection_requests.id
+        LEFT JOIN trucks
+        ON inspection_requests.truck_id = trucks.id
+        WHERE notifications.user_id = ?
+        ORDER BY notifications.id DESC
+    """, (session["user_id"],)).fetchall()
+
+    unread_count = conn.execute("""
+        SELECT COUNT(*) FROM notifications
+        WHERE user_id = ? AND is_read = 0
+    """, (session["user_id"],)).fetchone()[0]
+
+    mark_receipts_read(conn, session["user_id"])
+    conn.commit()
+
+    conn.close()
+
+    return render_template(
+        "receipts.html",
+        receipts=receipts,
+        unread_count=unread_count
     )
 
 
@@ -327,25 +574,45 @@ def inspection():
         mileage = request.form["mileage"]
         issue = request.form["issue"]
 
-        photo_name = save_photo(request.files.get("photo"))
+        uploads = request.files.getlist("photos")
 
-        conn.execute("""
+        cursor = conn.execute("""
             INSERT INTO inspection_requests
-            (truck_id, driver_id, date, mileage, issue, photo)
-            VALUES (?, ?, ?, ?, ?, ?)
+            (truck_id, driver_id, date, mileage, issue)
+            VALUES (?, ?, ?, ?, ?)
         """, (
             truck["id"],
             session["user_id"],
             date,
             mileage,
-            issue,
-            photo_name
+            issue
         ))
+
+        request_id = cursor.lastrowid
+
+        photo_names = save_photos(uploads)
+
+        if photo_names:
+            conn.executemany("""
+                INSERT INTO request_photos (request_id, filename, position)
+                VALUES (?, ?, ?)
+            """, [
+                (request_id, name, position)
+                for position, name in enumerate(photo_names)
+            ])
 
         conn.commit()
         conn.close()
 
-        flash("Inspection request submitted successfully.", "success")
+        message = "Inspection request submitted successfully."
+
+        if len(uploads) > MAX_PHOTOS:
+            message = (
+                f"Inspection request submitted. Only the first {MAX_PHOTOS} "
+                "photos were attached."
+            )
+
+        flash(message, "success")
 
         return redirect(url_for("dashboard"))
 
@@ -353,7 +620,8 @@ def inspection():
 
     return render_template(
         "inspection.html",
-        truck=truck
+        truck=truck,
+        max_photos=MAX_PHOTOS
     )
 
 
@@ -399,11 +667,17 @@ def requests():
             ORDER BY inspection_requests.id DESC
         """).fetchall()
 
+    photos_by_request = {}
+
+    for row in requests:
+        photos_by_request[row["id"]] = get_photos(conn, row["id"])
+
     conn.close()
 
     return render_template(
         "requests.html",
-        requests=requests
+        requests=requests,
+        photos_by_request=photos_by_request
     )
 
 
@@ -501,10 +775,19 @@ def complete_request(request_id):
         request_id
     ))
 
+    receipt_sent = send_receipt(conn, request_id, notes)
+
     conn.commit()
     conn.close()
 
-    flash("Maintenance marked as completed.", "success")
+    if receipt_sent:
+        flash(
+            "Maintenance marked as completed. The driver has been sent a "
+            "completion receipt.",
+            "success"
+        )
+    else:
+        flash("Maintenance marked as completed.", "success")
 
     return redirect(url_for("requests"))
 
@@ -611,45 +894,36 @@ def edit_request(request_id):
             flash("Please choose a valid truck.", "error")
 
         else:
-            new_photo = save_photo(request.files.get("photo"))
+            conn.execute("""
+                UPDATE inspection_requests
+                SET truck_id = ?,
+                    date = ?,
+                    mileage = ?,
+                    issue = ?
+                WHERE id = ?
+            """, (
+                truck_id,
+                date,
+                mileage,
+                issue,
+                request_id
+            ))
 
-            if new_photo:
-                conn.execute("""
-                    UPDATE inspection_requests
-                    SET truck_id = ?,
-                        date = ?,
-                        mileage = ?,
-                        issue = ?,
-                        photo = ?
-                    WHERE id = ?
-                """, (
-                    truck_id,
-                    date,
-                    mileage,
-                    issue,
-                    new_photo,
-                    request_id
-                ))
-            else:
-                conn.execute("""
-                    UPDATE inspection_requests
-                    SET truck_id = ?,
-                        date = ?,
-                        mileage = ?,
-                        issue = ?
-                    WHERE id = ?
-                """, (
-                    truck_id,
-                    date,
-                    mileage,
-                    issue,
-                    request_id
-                ))
+            uploads = request.files.getlist("photos")
+
+            photos_replaced = replace_photos(conn, request_id, uploads)
 
             conn.commit()
             conn.close()
 
-            flash("Request updated.", "success")
+            if photos_replaced and len(uploads) > MAX_PHOTOS:
+                flash(
+                    f"Request updated. Only the first {MAX_PHOTOS} photos "
+                    "were kept.",
+                    "success"
+                )
+            else:
+                flash("Request updated.", "success")
 
             return redirect(url_for("requests"))
 
@@ -662,12 +936,16 @@ def edit_request(request_id):
         (item["driver_id"],)
     ).fetchone()
 
+    photos = get_photos(conn, request_id)
+
     conn.close()
 
     return render_template(
         "request_edit.html",
         item=item,
         trucks=trucks,
+        photos=photos,
+        max_photos=MAX_PHOTOS,
         driver_name=driver["name"] if driver else "Unknown"
     )
 

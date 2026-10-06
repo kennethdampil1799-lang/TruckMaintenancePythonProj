@@ -62,10 +62,14 @@
         </div>
 
         <div class="field">
-            <label for="photo">Photo of the issue</label>
-            <input id="photo" type="file" name="photo" accept="image/*" data-preview>
-            <div class="preview" data-preview-target></div>
-            <p class="hint">Optional, but a clear photo speeds up the diagnosis.</p>
+            <label for="photos">Photos of the issue</label>
+            <input id="photos" type="file" name="photos" accept="image/*"
+                   multiple data-preview="{{ max_photos }}">
+            <div class="preview preview--grid" data-preview-target></div>
+            <p class="hint">
+                Optional, but clear photos speed up the diagnosis.
+                Up to {{ max_photos }} photos.
+            </p>
         </div>
 
         <button class="btn btn--primary" type="submit" {{ 'disabled' if not truck }}>

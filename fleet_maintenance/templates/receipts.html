@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}My Receipts — Fleet Maintenance{% endblock %}
+
+{% block page_title %}My maintenance receipts{% endblock %}
+
+{% block page_subtitle %}
+    Confirmation that your truck has finished its maintenance or repairs.
+{% endblock %}
+
+{% block page_actions %}
+    <a class="btn btn--ghost" href="{{ url_for('requests') }}">
+        <svg class="icon" aria-hidden="true"><use href="#i-list"></use></svg>
+        My requests
+    </a>
+{% endblock %}
+
+{% block content %}
+
+{% if receipts %}
+
+    <section class="panel" style="max-width: 780px; margin-top: 0;">
+
+        <div class="panel__head">
+            <span class="panel__icon">
+                <svg class="icon" aria-hidden="true"><use href="#i-check-badge"></use></svg>
+            </span>
+            <h3>
+                {{ receipts|length }} {{ 'receipt' if receipts|length == 1 else 'receipts' }}
+                on file
+            </h3>
+        </div>
+
+        <p>
+            A receipt is filed here the moment the maintenance team closes out
+            one of your requests. Keep it for your own records.
+        </p>
+
+        <ul class="receipts">
+            {% for receipt in receipts %}
+                <li class="receipt {{ 'is-unread' if not receipt['is_read'] }}">
+                    <div class="receipt__head">
+                        <strong>{{ receipt['title'] }}</strong>
+                        <time datetime="{{ receipt['created_at'] }}">
+                            {{ receipt['created_at'] or 'just now' }}
+                        </time>
+                    </div>
+                    <p class="receipt__body">{{ receipt['body'] }}</p>
+                    {% if receipt['request_id'] %}
+                        <a class="btn btn--ghost btn--sm"
+                           href="{{ url_for('requests') }}#request-{{ receipt['request_id'] }}">
+                            View request #{{ '%04d'|format(receipt['request_id']) }}
+                        </a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+
+    </section>
+
+{% else %}
+
+    <div class="panel" style="max-width: 780px; margin-top: 0;">
+        <div class="alert alert--success">
+            <svg class="icon" aria-hidden="true"><use href="#i-check-circle"></use></svg>
+            <span>No maintenance receipts yet. When a mechanic finishes work
+                on your truck, the receipt appears here.</span>
+        </div>
+
+        <a class="btn btn--primary" href="{{ url_for('inspection') }}">
+            <svg class="icon" aria-hidden="true"><use href="#i-clipboard"></use></svg>
+            Submit an inspection request
+        </a>
+    </div>
+
+{% endif %}
+
+{% endblock %}

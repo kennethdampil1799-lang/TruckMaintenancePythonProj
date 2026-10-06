@@ -44,21 +44,36 @@
     var preview = document.querySelector('[data-preview-target]');
 
     if (fileInput && preview) {
+        var maxPhotos = Number(fileInput.getAttribute('data-preview')) || 5;
+
         fileInput.addEventListener('change', function () {
-            var file = fileInput.files && fileInput.files[0];
+            var files = Array.prototype.slice.call(fileInput.files || []);
             preview.innerHTML = '';
             preview.classList.remove('is-visible');
 
-            if (!file || file.type.indexOf('image/') !== 0) return;
+            files.slice(0, maxPhotos).forEach(function (file, index) {
+                if (file.type.indexOf('image/') !== 0) return;
 
-            var img = document.createElement('img');
-            img.src = URL.createObjectURL(file);
-            img.alt = 'Selected photo preview';
-            img.addEventListener('load', function () {
-                URL.revokeObjectURL(img.src);
+                var img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.alt = 'Selected photo ' + (index + 1) + ' preview';
+                img.addEventListener('load', function () {
+                    URL.revokeObjectURL(img.src);
+                });
+                preview.appendChild(img);
             });
-            preview.appendChild(img);
-            preview.classList.add('is-visible');
+
+            if (files.length > maxPhotos) {
+                var notice = document.createElement('p');
+                notice.className = 'preview__notice';
+                notice.textContent = 'Only the first ' + maxPhotos +
+                    ' of ' + files.length + ' selected photos will be uploaded.';
+                preview.appendChild(notice);
+            }
+
+            if (preview.childElementCount) {
+                preview.classList.add('is-visible');
+            }
         });
     }
 

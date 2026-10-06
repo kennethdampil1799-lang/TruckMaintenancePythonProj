@@ -4,7 +4,11 @@
 
 {% block page_title %}Dashboard{% endblock %}
 {% block page_subtitle %}
-    Signed in as {{ session['role'] }} — here's where the fleet stands today.
+    {% if session['role'] == 'driver' %}
+        Signed in as driver — here's where your truck stands today.
+    {% else %}
+        Signed in as {{ session['role'] }} — here's where the fleet stands today.
+    {% endif %}
 {% endblock %}
 
 {% block page_actions %}
@@ -23,6 +27,49 @@
 
 {% block content %}
 
+{% if session['role'] == 'driver' and receipts %}
+
+    <section class="panel receipts-panel">
+
+        <div class="panel__head">
+            <span class="panel__icon">
+                <svg class="icon" aria-hidden="true"><use href="#i-check-badge"></use></svg>
+            </span>
+            <h3>
+                Maintenance receipts
+                {% if unread_count %}
+                    <span class="badge badge--alert">{{ unread_count }} new</span>
+                {% endif %}
+            </h3>
+        </div>
+
+        <p>Receipts are filed here when the maintenance team closes out one
+            of your requests. Your truck is back in service.</p>
+
+        <ul class="receipts">
+            {% for receipt in receipts %}
+                <li class="receipt {{ 'is-unread' if not receipt['is_read'] }}">
+                    <div class="receipt__head">
+                        <strong>{{ receipt['title'] }}</strong>
+                        <time datetime="{{ receipt['created_at'] }}">
+                            {{ receipt['created_at'] or 'just now' }}
+                        </time>
+                    </div>
+                    <p class="receipt__body">{{ receipt['body'] }}</p>
+                    {% if receipt['request_id'] %}
+                        <a class="btn btn--ghost btn--sm"
+                           href="{{ url_for('requests') }}#request-{{ receipt['request_id'] }}">
+                            View request #{{ '%04d'|format(receipt['request_id']) }}
+                        </a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+
+    </section>
+
+{% endif %}
+
 <div class="cards">
 
     <div class="card card--brand">
@@ -30,7 +77,7 @@
             <svg class="icon" aria-hidden="true"><use href="#i-truck"></use></svg>
         </span>
         <span class="card__text">
-            <span>Total trucks</span>
+            <span>{{ 'My trucks' if session['role'] == 'driver' else 'Total trucks' }}</span>
             <strong>{{ total_trucks }}</strong>
         </span>
     </div>
@@ -40,7 +87,7 @@
             <svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg>
         </span>
         <span class="card__text">
-            <span>Pending</span>
+            <span>{{ 'My pending' if session['role'] == 'driver' else 'Pending' }}</span>
             <strong>{{ pending_requests }}</strong>
         </span>
     </div>
@@ -50,7 +97,7 @@
             <svg class="icon" aria-hidden="true"><use href="#i-wrench"></use></svg>
         </span>
         <span class="card__text">
-            <span>In maintenance</span>
+            <span>{{ 'My trucks in maintenance' if session['role'] == 'driver' else 'In maintenance' }}</span>
             <strong>{{ maintenance_count }}</strong>
         </span>
     </div>
@@ -60,7 +107,7 @@
             <svg class="icon" aria-hidden="true"><use href="#i-check-badge"></use></svg>
         </span>
         <span class="card__text">
-            <span>Completed</span>
+            <span>{{ 'My completed' if session['role'] == 'driver' else 'Completed' }}</span>
             <strong>{{ completed_count }}</strong>
         </span>
     </div>
@@ -70,7 +117,7 @@
             <svg class="icon" aria-hidden="true"><use href="#i-ban"></use></svg>
         </span>
         <span class="card__text">
-            <span>Cancelled</span>
+            <span>{{ 'My cancelled' if session['role'] == 'driver' else 'Cancelled' }}</span>
             <strong>{{ cancelled_count }}</strong>
         </span>
     </div>
@@ -124,7 +171,7 @@
         </li>
         <li>
             <b>Step 3 · Close</b>
-            <p>The job is completed and the status updates for everyone.</p>
+            <p>The job is completed and you get a receipt on your dashboard.</p>
         </li>
     </ol>
 

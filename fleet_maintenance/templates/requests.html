@@ -67,7 +67,7 @@
 
                 {% for item in requests %}
 
-                <tr data-status="{{ item['status']|lower }}"
+                <tr id="request-{{ item['id'] }}" data-status="{{ item['status']|lower }}"
                     data-search="{{ item['truck_number'] }} {{ item['plate_number'] }}
                         {{ item['driver_name'] if not is_driver }} {{ item['issue'] }}">
 
@@ -86,11 +86,16 @@
 
                     <td class="cell-issue" data-label="Issue">
                         <div class="issue-wrap">
-                            {% if item['photo'] %}
-                                <img class="thumb"
-                                     src="{{ url_for('static', filename='uploads/' + item['photo']) }}"
-                                     alt="Photo for request #{{ item['id'] }}"
-                                     loading="lazy">
+                            {% set row_photos = photos_by_request.get(item['id'], []) %}
+                            {% if row_photos %}
+                                <div class="thumb-grid">
+                                    {% for photo in row_photos %}
+                                        <img class="thumb"
+                                             src="{{ url_for('static', filename='uploads/' + photo) }}"
+                                             alt="Photo {{ loop.index }} for request #{{ item['id'] }}"
+                                             loading="lazy">
+                                    {% endfor %}
+                                </div>
                             {% endif %}
                             <span class="cell-issue__text {{ 'is-empty' if not item['issue'] }}">
                                 {{ item['issue'] if item['issue'] else 'No description provided' }}

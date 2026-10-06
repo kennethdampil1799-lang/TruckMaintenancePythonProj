@@ -34,14 +34,19 @@
         </div>
     </div>
 
-    {% if item['photo'] %}
+    {% if photos %}
         <div class="field">
-            <label>Uploaded photo</label>
-            <div class="preview is-visible" style="margin-top: 0;">
-                <img src="{{ url_for('static', filename='uploads/' + item['photo']) }}"
-                     alt="Photo attached to this request">
+            <label>Uploaded photos</label>
+            <div class="preview preview--grid is-visible" style="margin-top: 0;">
+                {% for photo in photos %}
+                    <img src="{{ url_for('static', filename='uploads/' + photo) }}"
+                         alt="Photo {{ loop.index }} attached to this request">
+                {% endfor %}
             </div>
-            <p class="hint">Uploading a new file below replaces this photo.</p>
+            <p class="hint">
+                {{ photos|length }} of {{ max_photos }} attached.
+                Uploading new files below replaces {{ 'this photo' if photos|length == 1 else 'these photos' }}.
+            </p>
         </div>
     {% endif %}
 
@@ -79,10 +84,18 @@
         </div>
 
         <div class="field">
-            <label for="photo">Replace photo</label>
-            <input id="photo" type="file" name="photo" accept="image/*" data-preview>
-            <div class="preview" data-preview-target></div>
-            <p class="hint">Optional. Leave empty to keep the current photo.</p>
+            <label for="photos">{{ 'Replace photo' if photos|length == 1 else 'Replace photos' }}</label>
+            <input id="photos" type="file" name="photos" accept="image/*"
+                   multiple data-preview="{{ max_photos }}">
+            <div class="preview preview--grid" data-preview-target></div>
+            <p class="hint">
+                Optional, up to {{ max_photos }} photos.
+                {% if photos %}
+                    Leave empty to keep the {{ 'current photo' if photos|length == 1 else 'current photos' }}.
+                {% else %}
+                    No photos are attached yet.
+                {% endif %}
+            </p>
         </div>
 
         <div class="form-actions">
