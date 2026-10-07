@@ -19,7 +19,7 @@
 
 {% if receipts %}
 
-    <section class="panel" style="max-width: 780px; margin-top: 0;">
+    <section class="panel u-narrow">
 
         <div class="panel__head">
             <span class="panel__icon">
@@ -60,18 +60,20 @@
 
 {% else %}
 
-    <div class="panel" style="max-width: 780px; margin-top: 0;">
-        <div class="alert alert--success">
-            <svg class="icon" aria-hidden="true"><use href="#i-check-circle"></use></svg>
-            <span>No maintenance receipts yet. When a mechanic finishes work
-                on your truck, the receipt appears here.</span>
-        </div>
-
+    <div class="panel u-narrow">
+    <div class="empty">
+        <svg class="icon" aria-hidden="true"><use href="#i-check-badge"></use></svg>
+        <strong>No maintenance receipts yet</strong>
+        <p>
+            When a mechanic finishes work on your truck, a receipt is filed here
+            confirming the job is closed and your vehicle is back in service.
+        </p>
         <a class="btn btn--primary" href="{{ url_for('inspection') }}">
             <svg class="icon" aria-hidden="true"><use href="#i-clipboard"></use></svg>
             Submit an inspection request
         </a>
     </div>
+</div>
 
 {% endif %}
 

@@ -17,11 +17,11 @@
 
 {% block content %}
 
-<div class="panel" style="max-width: 620px; margin-top: 0;">
+<div class="panel u-narrow-sm">
 
     {% if not truck %}
 
-        <div class="alert alert--error">
+        <div class="alert alert--error" role="status">
             <svg class="icon" aria-hidden="true"><use href="#i-alert-circle"></use></svg>
             <span>No truck is assigned to your account yet. Ask an administrator
                 to link your vehicle before editing these details.</span>
@@ -46,26 +46,31 @@
             </div>
         </div>
 
-        <div class="field">
-            <label for="truck_number">Truck number</label>
-            <input id="truck_number" type="text" name="truck_number"
-                   value="{{ truck['truck_number'] if truck else '' }}"
-                   placeholder="e.g. TRK-001" maxlength="40" required>
-            <p class="hint">The internal fleet identifier for your vehicle.</p>
+        <div class="field-row">
+            <div class="field">
+                <label for="truck_number">Truck number <span class="req" aria-hidden="true">*</span></label>
+                <input id="truck_number" type="text" name="truck_number"
+                       value="{{ truck['truck_number'] if truck else '' }}"
+                       placeholder="e.g. TRK-001" maxlength="40" required>
+                <p class="hint">The internal fleet identifier for your vehicle.</p>
+            </div>
+
+            <div class="field">
+                <label for="plate_number">Plate number <span class="req" aria-hidden="true">*</span></label>
+                <input id="plate_number" type="text" name="plate_number"
+                       value="{{ truck['plate_number'] if truck else '' }}"
+                       placeholder="e.g. ABC-1234" maxlength="40" required>
+                <p class="hint">The registration plate shown on the vehicle.</p>
+            </div>
         </div>
 
-        <div class="field">
-            <label for="plate_number">Plate number</label>
-            <input id="plate_number" type="text" name="plate_number"
-                   value="{{ truck['plate_number'] if truck else '' }}"
-                   placeholder="e.g. ABC-1234" maxlength="40" required>
-            <p class="hint">The registration plate shown on the vehicle.</p>
+        <div class="form-actions">
+            <button class="btn btn--primary" type="submit" data-busy-label="Saving…" {{ 'disabled' if not truck }}>
+                <svg class="icon" aria-hidden="true"><use href="#i-truck"></use></svg>
+                Save truck details
+            </button>
+            <a class="btn btn--ghost" href="{{ url_for('dashboard') }}">Cancel</a>
         </div>
-
-        <button class="btn btn--primary" type="submit" {{ 'disabled' if not truck }}>
-            <svg class="icon" aria-hidden="true"><use href="#i-truck"></use></svg>
-            Save truck details
-        </button>
 
     </form>
 

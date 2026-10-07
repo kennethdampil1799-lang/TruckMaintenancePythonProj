@@ -17,7 +17,7 @@
 
 {% block content %}
 
-<div class="panel" style="max-width: 760px; margin-top: 0;">
+<div class="panel u-narrow">
 
     <div class="truck-strip">
         <div class="truck-strip__cell">
@@ -37,7 +37,7 @@
     {% if photos %}
         <div class="field">
             <label>Uploaded photos</label>
-            <div class="preview preview--grid is-visible" style="margin-top: 0;">
+            <div class="preview preview--grid is-visible">
                 {% for photo in photos %}
                     <img src="{{ url_for('static', filename='uploads/' + photo) }}"
                          alt="Photo {{ loop.index }} attached to this request">
@@ -53,7 +53,7 @@
     <form method="POST" enctype="multipart/form-data">
 
         <div class="field">
-            <label for="truck_id">Truck</label>
+            <label for="truck_id">Truck <span class="req" aria-hidden="true">*</span></label>
             <select id="truck_id" name="truck_id" required>
                 {% for t in trucks %}
                     <option value="{{ t['id'] }}"
@@ -64,21 +64,23 @@
             </select>
         </div>
 
-        <div class="field">
-            <label for="date">Inspection date</label>
-            <input id="date" type="date" name="date"
-                   value="{{ item['date'] }}" required>
+        <div class="field-row">
+            <div class="field">
+                <label for="date">Inspection date <span class="req" aria-hidden="true">*</span></label>
+                <input id="date" type="date" name="date"
+                       value="{{ item['date'] }}" required>
+            </div>
+
+            <div class="field">
+                <label for="mileage">Mileage</label>
+                <input id="mileage" type="text" name="mileage"
+                       value="{{ item['mileage'] or '' }}"
+                       placeholder="e.g. 45,000 km">
+            </div>
         </div>
 
         <div class="field">
-            <label for="mileage">Mileage</label>
-            <input id="mileage" type="text" name="mileage"
-                   value="{{ item['mileage'] or '' }}"
-                   placeholder="e.g. 45,000 km">
-        </div>
-
-        <div class="field">
-            <label for="issue">Issue description</label>
+            <label for="issue">Issue description <span class="req" aria-hidden="true">*</span></label>
             <textarea id="issue" name="issue" rows="5" data-counter
                       required>{{ item['issue'] }}</textarea>
         </div>
@@ -99,13 +101,12 @@
         </div>
 
         <div class="form-actions">
-            <button class="btn btn--primary" type="submit">
+            <button class="btn btn--primary" type="submit" data-busy-label="Saving…">
                 <svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>
                 Save changes
             </button>
             <a class="btn btn--ghost" href="{{ url_for('requests') }}">Cancel</a>
         </div>
-
     </form>
 
 </div>

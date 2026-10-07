@@ -160,7 +160,7 @@ def init_db():
         """, (
             "driver",
             generate_password_hash("driver123"),
-            "Truck Driver",
+            "Juan Dela Cruz",
             "driver"
         ))
 
@@ -1046,6 +1046,152 @@ def reopen_request(request_id):
     flash("Request reopened and returned to pending.", "success")
 
     return redirect(url_for("requests"))
+
+
+# =========================
+# ADMIN DRIVERS & MECHANICS
+# =========================
+
+@app.route("/admin/users")
+def admin_users():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if session["role"] != "admin":
+        flash("Only administrators can view the driver and mechanic list.", "error")
+        return redirect(url_for("dashboard"))
+
+    conn = get_db()
+
+    # Driver rows carry their truck details so the admin can spot vehicles
+    # that are still unassigned. Mechanics never own a truck, so the join
+    # simply leaves those columns empty for them.
+    staff = conn.execute("""
+        SELECT
+            users.id,
+            users.username,
+            users.name,
+            users.role,
+            trucks.id AS truck_id,
+            trucks.truck_number,
+            trucks.plate_number
+        FROM users
+        LEFT JOIN trucks ON users.id = trucks.driver_id
+        WHERE users.role IN ('driver', 'mechanic')
+        ORDER BY
+            CASE users.role WHEN 'driver' THEN 0 ELSE 1 END,
+            users.name
+    """).fetchall()
+
+    conn.close()
+
+    return render_template("admin_users.html", staff=staff)
+
+
+@app.route("/admin/user/<int:user_id>/edit", methods=["GET", "POST"])
+def admin_edit_user(user_id):
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    if session["role"] != "admin":
+        flash("Only administrators can edit driver and mechanic accounts.", "error")
+        return redirect(url_for("requests"))
+
+    conn = get_db()
+
+    # Administrators are excluded on purpose so an admin cannot lock the
+    # system out by editing or demoting an administrator account.
+    person = conn.execute("""
+        SELECT * FROM users
+        WHERE id = ? AND role IN ('driver', 'mechanic')
+    """, (user_id,)).fetchone()
+
+    if not person:
+        conn.close()
+        flash("Account not found.", "error")
+        return redirect(url_for("admin_users"))
+
+    truck = conn.execute(
+        "SELECT * FROM trucks WHERE driver_id = ?",
+        (user_id,)
+    ).fetchone()
+
+    if request.method == "POST":
+
+        name = request.form["name"].strip()
+        username = request.form["username"].strip()
+        role = request.form["role"]
+        password = request.form.get("password", "")
+
+        truck_number = request.form.get("truck_number", "").strip()
+        plate_number = request.form.get("plate_number", "").strip()
+
+        username_taken = conn.execute(
+            "SELECT id FROM users WHERE username = ? AND id != ?",
+            (username, user_id)
+        ).fetchone()
+
+        if not name or not username:
+            flash("Full name and username are both required.", "error")
+
+        elif role not in ["driver", "mechanic"]:
+            flash("Please choose a valid account type.", "error")
+
+        elif username_taken:
+            flash("That username is already taken.", "error")
+
+        elif password and len(password) < 6:
+            flash("New password must be at least 6 characters.", "error")
+
+        elif truck and (not truck_number or not plate_number):
+            flash("Truck number and plate number are both required.", "error")
+
+        else:
+
+            conn.execute("""
+                UPDATE users
+                SET name = ?, username = ?, role = ?
+                WHERE id = ?
+            """, (
+                name,
+                username,
+                role,
+                user_id
+            ))
+
+            if password:
+                conn.execute(
+                    "UPDATE users SET password = ? WHERE id = ?",
+                    (generate_password_hash(password), user_id)
+                )
+
+            if truck:
+                conn.execute("""
+                    UPDATE trucks
+                    SET truck_number = ?, plate_number = ?
+                    WHERE id = ?
+                """, (
+                    truck_number,
+                    plate_number,
+                    truck["id"]
+                ))
+
+            conn.commit()
+            conn.close()
+
+            flash(f"{name}'s account was updated.", "success")
+
+            return redirect(url_for("admin_users"))
+
+    conn.close()
+
+    return render_template(
+        "admin_user_edit.html",
+        person=person,
+        truck=truck
+    )
 
 
 # =========================

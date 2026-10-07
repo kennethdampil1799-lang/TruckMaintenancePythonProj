@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Drivers &amp; Mechanics — Fleet Maintenance{% endblock %}
+
+{% block page_title %}Drivers &amp; mechanics{% endblock %}
+{% block page_subtitle %}
+    Every driver and mechanic account, along with the vehicle assigned to
+    each driver. Select Edit to correct names, logins, or truck details.
+{% endblock %}
+
+{% block content %}
+
+{% if staff %}
+<div class="table-card">
+
+    <div class="table-toolbar">
+        <div class="table-toolbar__search">
+            <svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg>
+            <input type="search" placeholder="Filter by name, username or truck…"
+                   aria-label="Filter drivers and mechanics" data-table-filter>
+        </div>
+    </div>
+
+    <div class="table-scroll">
+
+        <table class="table--stack">
+
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Username</th>
+                    <th scope="col">Role</th>
+                    <th scope="col">Truck</th>
+                    <th scope="col">Plate</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for person in staff %}
+
+                <tr data-search="{{ person['name'] }} {{ person['username'] }}
+                    {{ person['truck_number'] or '' }} {{ person['plate_number'] or '' }}">
+
+                    <td data-label="Name">
+                        <div class="cell-truck">
+                            <strong>{{ person['name'] }}</strong>
+                            <span>#{{ '%04d'|format(person['id']) }}</span>
+                        </div>
+                    </td>
+
+                    <td class="cell-id" data-label="Username">{{ person['username'] }}</td>
+
+                    <td data-label="Role">
+                        <span class="role-badge" data-role="{{ person['role'] }}">
+                            {{ person['role'] }}
+                        </span>
+                    </td>
+
+                    <td class="cell-truck" data-label="Truck">
+                        {% if person['truck_number'] %}
+                            <strong>{{ person['truck_number'] }}</strong>
+                        {% else %}
+                            <span class="dash" title="No truck assigned">—</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="cell-date" data-label="Plate">
+                        {{ person['plate_number'] if person['plate_number'] else '—' }}
+                    </td>
+
+                    <td data-label="Action">
+                        <div class="row-actions">
+                            <a class="btn btn--sm btn--ghost"
+                               href="{{ url_for('admin_edit_user', user_id=person['id']) }}">
+                                <svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>
+                                Edit
+                            </a>
+                        </div>
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <p class="no-match" data-no-match hidden>
+        No accounts match your filter.
+    </p>
+
+</div>
+
+{% else %}
+
+<div class="panel empty">
+    <svg class="icon" aria-hidden="true"><use href="#i-users"></use></svg>
+    <strong>No drivers or mechanics yet</strong>
+    <p>
+        Drivers and mechanics created through the sign-up page will appear
+        here so you can assign and correct their details.
+    </p>
+</div>
+
+{% endif %}
+
+{% endblock %}

@@ -5,7 +5,7 @@
 {% block page_title %}Dashboard{% endblock %}
 {% block page_subtitle %}
     {% if session['role'] == 'driver' %}
-        Signed in as driver — here's where your truck stands today.
+        Signed in as a driver — here's where your truck stands today.
     {% else %}
         Signed in as {{ session['role'] }} — here's where the fleet stands today.
     {% endif %}
@@ -27,7 +27,82 @@
 
 {% block content %}
 
-{% if session['role'] == 'driver' and receipts %}
+{% set is_driver = session['role'] == 'driver' %}
+
+<div class="cards">
+
+    <a class="card card--muted" href="{{ url_for('requests') }}">
+        <span class="card__icon">
+            <svg class="icon" aria-hidden="true"><use href="#i-truck"></use></svg>
+        </span>
+        <span class="card__text">
+            <span>{{ 'My trucks' if is_driver else 'Total trucks' }}</span>
+            <strong>{{ total_trucks }}</strong>
+        </span>
+        <span class="card__go" aria-hidden="true">
+            <svg class="icon"><use href="#i-arrow-right"></use></svg>
+        </span>
+    </a>
+
+    {# Amber only reads as "needs attention" while there is something waiting. #}
+    <a class="card {{ 'card--warn' if pending_requests else 'card--muted' }}"
+       href="{{ url_for('requests') }}?status=pending">
+        <span class="card__icon">
+            <svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg>
+        </span>
+        <span class="card__text">
+            <span>{{ 'My pending' if is_driver else 'Pending' }}</span>
+            <strong>{{ pending_requests }}</strong>
+        </span>
+        <span class="card__go" aria-hidden="true">
+            <svg class="icon"><use href="#i-arrow-right"></use></svg>
+        </span>
+    </a>
+
+    <a class="card {{ 'card--info' if maintenance_count else 'card--muted' }}"
+       href="{{ url_for('requests') }}?status=in+maintenance">
+        <span class="card__icon">
+            <svg class="icon" aria-hidden="true"><use href="#i-wrench"></use></svg>
+        </span>
+        <span class="card__text">
+            <span>{{ 'My trucks in maintenance' if is_driver else 'In maintenance' }}</span>
+            <strong>{{ maintenance_count }}</strong>
+        </span>
+        <span class="card__go" aria-hidden="true">
+            <svg class="icon"><use href="#i-arrow-right"></use></svg>
+        </span>
+    </a>
+
+    <a class="card {{ 'card--ok' if completed_count else 'card--muted' }}"
+       href="{{ url_for('requests') }}?status=completed">
+        <span class="card__icon">
+            <svg class="icon" aria-hidden="true"><use href="#i-check-badge"></use></svg>
+        </span>
+        <span class="card__text">
+            <span>{{ 'My completed' if is_driver else 'Completed' }}</span>
+            <strong>{{ completed_count }}</strong>
+        </span>
+        <span class="card__go" aria-hidden="true">
+            <svg class="icon"><use href="#i-arrow-right"></use></svg>
+        </span>
+    </a>
+
+    <a class="card card--muted" href="{{ url_for('requests') }}?status=cancelled">
+        <span class="card__icon">
+            <svg class="icon" aria-hidden="true"><use href="#i-ban"></use></svg>
+        </span>
+        <span class="card__text">
+            <span>{{ 'My cancelled' if is_driver else 'Cancelled' }}</span>
+            <strong>{{ cancelled_count }}</strong>
+        </span>
+        <span class="card__go" aria-hidden="true">
+            <svg class="icon"><use href="#i-arrow-right"></use></svg>
+        </span>
+    </a>
+
+</div>
+
+{% if is_driver and receipts %}
 
     <section class="panel receipts-panel">
 
@@ -70,65 +145,11 @@
 
 {% endif %}
 
-<div class="cards">
-
-    <div class="card card--brand">
-        <span class="card__icon">
-            <svg class="icon" aria-hidden="true"><use href="#i-truck"></use></svg>
-        </span>
-        <span class="card__text">
-            <span>{{ 'My trucks' if session['role'] == 'driver' else 'Total trucks' }}</span>
-            <strong>{{ total_trucks }}</strong>
-        </span>
-    </div>
-
-    <div class="card card--warn">
-        <span class="card__icon">
-            <svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg>
-        </span>
-        <span class="card__text">
-            <span>{{ 'My pending' if session['role'] == 'driver' else 'Pending' }}</span>
-            <strong>{{ pending_requests }}</strong>
-        </span>
-    </div>
-
-    <div class="card card--info">
-        <span class="card__icon">
-            <svg class="icon" aria-hidden="true"><use href="#i-wrench"></use></svg>
-        </span>
-        <span class="card__text">
-            <span>{{ 'My trucks in maintenance' if session['role'] == 'driver' else 'In maintenance' }}</span>
-            <strong>{{ maintenance_count }}</strong>
-        </span>
-    </div>
-
-    <div class="card card--ok">
-        <span class="card__icon">
-            <svg class="icon" aria-hidden="true"><use href="#i-check-badge"></use></svg>
-        </span>
-        <span class="card__text">
-            <span>{{ 'My completed' if session['role'] == 'driver' else 'Completed' }}</span>
-            <strong>{{ completed_count }}</strong>
-        </span>
-    </div>
-
-    <div class="card card--muted">
-        <span class="card__icon">
-            <svg class="icon" aria-hidden="true"><use href="#i-ban"></use></svg>
-        </span>
-        <span class="card__text">
-            <span>{{ 'My cancelled' if session['role'] == 'driver' else 'Cancelled' }}</span>
-            <strong>{{ cancelled_count }}</strong>
-        </span>
-    </div>
-
-</div>
-
 <section class="panel">
 
     <div class="panel__head">
         <span class="panel__icon">
-            {% if session['role'] == 'driver' %}
+            {% if is_driver %}
                 <svg class="icon" aria-hidden="true"><use href="#i-clipboard"></use></svg>
             {% elif session['role'] == 'mechanic' %}
                 <svg class="icon" aria-hidden="true"><use href="#i-wrench"></use></svg>
@@ -137,7 +158,7 @@
             {% endif %}
         </span>
         <h3>
-            {% if session['role'] == 'driver' %}
+            {% if is_driver %}
                 Report a vehicle problem
             {% elif session['role'] == 'mechanic' %}
                 Work the maintenance queue
@@ -148,7 +169,7 @@
     </div>
 
     <p>
-        {% if session['role'] == 'driver' %}
+        {% if is_driver %}
             Submit an inspection request whenever your truck needs service.
             Add a photo so the mechanic can diagnose the issue faster.
         {% elif session['role'] == 'mechanic' %}
@@ -175,8 +196,8 @@
         </li>
     </ol>
 
-    <a class="btn" href="{{ url_for('inspection') if session['role'] == 'driver' else url_for('requests') }}">
-        {% if session['role'] == 'driver' %}
+    <a class="btn" href="{{ url_for('inspection') if is_driver else url_for('requests') }}">
+        {% if is_driver %}
             Submit inspection
         {% else %}
             Open requests

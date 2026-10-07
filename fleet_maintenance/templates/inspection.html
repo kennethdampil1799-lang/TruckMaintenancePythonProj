@@ -16,10 +16,10 @@
 
 {% block content %}
 
-<div class="panel" style="max-width: 760px; margin-top: 0;">
+<div class="panel u-narrow">
 
     {% if not truck %}
-        <div class="alert alert--error">
+        <div class="alert alert--error" role="status">
             <svg class="icon" aria-hidden="true"><use href="#i-alert-circle"></use></svg>
             <span>No truck is assigned to your account yet. Ask an administrator to link
                 your vehicle before submitting a request.</span>
@@ -43,19 +43,21 @@
             </div>
         </div>
 
-        <div class="field">
-            <label for="date">Inspection date</label>
-            <input id="date" type="date" name="date" data-today required>
+        <div class="field-row">
+            <div class="field">
+                <label for="date">Inspection date <span class="req" aria-hidden="true">*</span></label>
+                <input id="date" type="date" name="date" data-today required>
+            </div>
+
+            <div class="field">
+                <label for="mileage">Current mileage</label>
+                <input id="mileage" type="text" name="mileage" placeholder="e.g. 45,000 km">
+                <p class="hint">Helps the mechanic judge wear and service intervals.</p>
+            </div>
         </div>
 
         <div class="field">
-            <label for="mileage">Current mileage</label>
-            <input id="mileage" type="text" name="mileage" placeholder="e.g. 45,000 km">
-            <p class="hint">Helps the mechanic judge wear and service intervals.</p>
-        </div>
-
-        <div class="field">
-            <label for="issue">Issue or inspection concern</label>
+            <label for="issue">Issue or inspection concern <span class="req" aria-hidden="true">*</span></label>
             <textarea id="issue" name="issue" rows="5" data-counter
                       placeholder="Describe what you noticed — what happened, and when it started."
                       required></textarea>
@@ -72,10 +74,13 @@
             </p>
         </div>
 
-        <button class="btn btn--primary" type="submit" {{ 'disabled' if not truck }}>
-            <svg class="icon" aria-hidden="true"><use href="#i-clipboard"></use></svg>
-            Submit inspection request
-        </button>
+        <div class="form-actions">
+            <button class="btn btn--primary" type="submit" data-busy-label="Submitting…" {{ 'disabled' if not truck }}>
+                <svg class="icon" aria-hidden="true"><use href="#i-clipboard"></use></svg>
+                Submit inspection request
+            </button>
+            <a class="btn btn--ghost" href="{{ url_for('requests') }}">Cancel</a>
+        </div>
 
     </form>
 

@@ -107,7 +107,11 @@
     /* ---------- Request table filtering ---------- */
     var searchInput = document.querySelector('[data-table-filter]');
     var statusButtons = document.querySelectorAll('[data-status-filter]');
-    var rows = Array.prototype.slice.call(document.querySelectorAll('tbody tr[data-status]'));
+    /* Rows opt in by carrying data-search (and, where they can be filtered
+       by state, data-status). The account list is search-only. */
+    var rows = Array.prototype.slice.call(
+        document.querySelectorAll('tbody tr[data-search], tbody tr[data-status]')
+    );
     var noMatch = document.querySelector('[data-no-match]');
 
     if (rows.length && (searchInput || statusButtons.length)) {
@@ -128,6 +132,26 @@
             if (noMatch) noMatch.hidden = visible !== 0;
         }
 
+        function selectStatus(value) {
+            var match = null;
+
+            statusButtons.forEach(function (btn) {
+                if (btn.getAttribute('data-status-filter') === value) match = btn;
+            });
+
+            if (!match) return false;
+
+            statusButtons.forEach(function (b) { b.classList.remove('is-active'); });
+            match.classList.add('is-active');
+            activeStatus = value;
+            return true;
+        }
+
+        /* Dashboard stat cards link here with ?status=..., so the list should
+           open on the matching filter instead of always landing on "All". */
+        var requested = new URLSearchParams(window.location.search).get('status');
+        if (requested) selectStatus(requested.replace(/\+/g, ' ').trim());
+
         if (searchInput) searchInput.addEventListener('input', applyFilters);
 
         statusButtons.forEach(function (btn) {
@@ -138,7 +162,46 @@
                 applyFilters();
             });
         });
+
+        applyFilters();
     }
+
+    /* ---------- Highlight a deep-linked request row ---------- */
+    if (window.location.hash) {
+        var target = document.querySelector(window.location.hash);
+        if (target && target.tagName === 'TR') {
+            target.classList.add('is-highlight');
+            target.scrollIntoView({ block: 'center' });
+        }
+    }
+
+    /* ---------- Submitting state ---------- */
+    document.querySelectorAll('form').forEach(function (form) {
+        form.addEventListener('submit', function (e) {
+            /* A cancelled data-confirm handler above already stopped this
+               submit; marking it busy would leave the button stuck. */
+            if (e.defaultPrevented) return;
+
+            var button = form.querySelector('button[type="submit"]');
+            if (!button || button.dataset.busyApplied === '1') return;
+
+            var icon = button.querySelector('.icon');
+
+            button.dataset.busyApplied = '1';
+            button.dataset.idleHtml = button.innerHTML;
+            button.classList.add('is-busy');
+            button.setAttribute('aria-busy', 'true');
+
+            /* Rebuild as icon + label so the wording can be swapped without
+               depending on whether the text sat inside a <span>. */
+            button.innerHTML = '';
+            if (icon) button.appendChild(icon);
+
+            var label = document.createElement('span');
+            label.textContent = button.getAttribute('data-busy-label') || 'Working…';
+            button.appendChild(label);
+        });
+    });
 
     /* ---------- Auto-dismiss flash messages ---------- */
     document.querySelectorAll('.alert').forEach(function (alert) {

@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Edit {{ person['name'] }} — Fleet Maintenance{% endblock %}
+
+{% block page_title %}Edit {{ person['name'] }}{% endblock %}
+{% block page_subtitle %}
+    Update this account's details and the vehicle it is responsible for.
+    Passwords are only changed if you type a new one.
+{% endblock %}
+
+{% block page_actions %}
+    <a class="btn btn--ghost" href="{{ url_for('admin_users') }}">
+        <svg class="icon" aria-hidden="true"><use href="#i-users"></use></svg>
+        Back to list
+    </a>
+{% endblock %}
+
+{% block content %}
+
+<div class="panel u-narrow">
+
+    <div class="truck-strip">
+        <div class="truck-strip__cell">
+            <span>Username</span>
+            <strong>{{ person['username'] }}</strong>
+        </div>
+        <div class="truck-strip__cell">
+            <span>Current role</span>
+            <strong>
+                <span class="role-badge" data-role="{{ person['role'] }}">
+                    {{ person['role'] }}
+                </span>
+            </strong>
+        </div>
+    </div>
+
+    <form method="POST">
+
+        <div class="field">
+            <label for="name">Full name <span class="req" aria-hidden="true">*</span></label>
+            <input id="name" type="text" name="name"
+                   value="{{ person['name'] }}"
+                   placeholder="e.g. Juan Dela Cruz" maxlength="80" required>
+            <p class="hint">Shown on requests, receipts, and the driver's own page.</p>
+        </div>
+
+        <div class="field">
+            <label for="username">Username <span class="req" aria-hidden="true">*</span></label>
+            <input id="username" type="text" name="username"
+                   value="{{ person['username'] }}"
+                   placeholder="e.g. driver" maxlength="40" required>
+            <p class="hint">Used to sign in. It must be unique across the fleet.</p>
+        </div>
+
+        <div class="field">
+            <label for="role">Account type <span class="req" aria-hidden="true">*</span></label>
+            <select id="role" name="role" required>
+                <option value="driver" {{ 'selected' if person['role'] == 'driver' }}>
+                    Truck Driver
+                </option>
+                <option value="mechanic" {{ 'selected' if person['role'] == 'mechanic' }}>
+                    Mechanic
+                </option>
+            </select>
+            <p class="hint">
+                Changing this changes what the account is allowed to do. Any truck
+                stays linked to the account either way.
+            </p>
+        </div>
+
+        <div class="field">
+            <label for="password">New password</label>
+            <input id="password" type="text" name="password"
+                   placeholder="Leave blank to keep the current password"
+                   maxlength="80" autocomplete="new-password">
+            <p class="hint">At least 6 characters. Leave empty if the password is fine.</p>
+        </div>
+
+        {% if truck %}
+
+            <div class="truck-strip">
+                <div class="truck-strip__cell">
+                    <span>Truck record</span>
+                    <strong>#{{ '%04d'|format(truck['id']) }}</strong>
+                </div>
+                <div class="truck-strip__cell">
+                    <span>Currently linked to</span>
+                    <strong>{{ person['name'] }}</strong>
+                </div>
+            </div>
+
+            <div class="field-row">
+                <div class="field">
+                    <label for="truck_number">Truck number <span class="req" aria-hidden="true">*</span></label>
+                    <input id="truck_number" type="text" name="truck_number"
+                           value="{{ truck['truck_number'] }}"
+                           placeholder="e.g. TRK-001" maxlength="40" required>
+                </div>
+
+                <div class="field">
+                    <label for="plate_number">Plate number <span class="req" aria-hidden="true">*</span></label>
+                    <input id="plate_number" type="text" name="plate_number"
+                           value="{{ truck['plate_number'] }}"
+                           placeholder="e.g. ABC-1234" maxlength="40" required>
+                </div>
+            </div>
+
+        {% elif person['role'] == 'driver' %}
+
+            <div class="alert alert--error alert--spaced" role="status">
+                <svg class="icon" aria-hidden="true"><use href="#i-alert-circle"></use></svg>
+                <span>No truck is linked to this driver yet, so there are no
+                    vehicle details to edit here.</span>
+            </div>
+
+        {% endif %}
+
+        <div class="form-actions">
+            <button class="btn btn--primary" type="submit" data-busy-label="Saving…">
+                <svg class="icon" aria-hidden="true"><use href="#i-pencil"></use></svg>
+                Save changes
+            </button>
+            <a class="btn btn--ghost" href="{{ url_for('admin_users') }}">Cancel</a>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
