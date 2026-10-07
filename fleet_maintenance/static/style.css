@@ -14,7 +14,7 @@
 
 :root {
     /* Surfaces, from page background up to raised panels */
-    --bg: #f1f4f3;
+    --bg: #f2f5f4;
     --bg-accent: #e6edea;
     --surface: #ffffff;
     --surface-2: #f7f9f9;
@@ -31,7 +31,7 @@
        text), so it is tuned to clear 4.5:1 against --bg, not just --surface. */
     --text: #16211e;
     --text-2: #4d5c57;
-    --muted: #5f6d67;
+    --muted: #57655f;
 
     /* Brand - deep forest green, used for identity and primary actions */
     --brand: #35705a;
@@ -69,11 +69,33 @@
     --warn-bg: var(--pending-bg);
     --warn-fg: var(--pending-fg);
 
+    /* App rail - a soft green tint rather than plain white, so the navigation
+       reads as its own surface and the app still has a clear green identity
+       without resorting to a dark bar. */
+    --rail-bg: #e9f2ed;
+    --rail-bg-2: #dfebe5;
+    --rail-bg-3: #d3e6dc;
+    --rail-border: #d5e4dc;
+    --rail-border-soft: #dfeae4;
+    --rail-text: #16211e;
+    --rail-text-2: #43534e;
+    --rail-muted: #56665f;
+    /* --rail-accent fills the active nav pill, so it must stay deep enough
+       to carry white text at 6:1. */
+    --rail-accent: #2f6d55;
+    --rail-accent-solid: #2f6d55;
+    --rail-accent-text: #ffffff;
+    --rail-inset: rgba(255, 255, 255, .78);
+    --rail-top: #ffffff;
+    --rail-sheen: linear-gradient(180deg, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0));
+
     --scrim: rgba(14, 32, 26, .42);
 
     /* Elevation */
     --shadow-xs: 0 1px 2px rgba(18, 38, 31, .05);
-    --shadow-sm: 0 1px 2px rgba(18, 38, 31, .05), 0 1px 1px rgba(18, 38, 31, .03);
+    /* A touch more lift than before, so cards read as raised off a patterned
+       canvas rather than printed on it. */
+    --shadow-sm: 0 1px 2px rgba(18, 38, 31, .05), 0 3px 8px -3px rgba(18, 38, 31, .09);
     --shadow: 0 2px 4px rgba(18, 38, 31, .04), 0 10px 24px -14px rgba(18, 38, 31, .16);
     --shadow-lg: 0 8px 20px -8px rgba(18, 38, 31, .12), 0 28px 56px -28px rgba(18, 38, 31, .3);
     --shadow-focus: 0 0 0 3px rgba(53, 112, 90, .18);
@@ -96,6 +118,17 @@
     --s-8: 32px;
     --s-10: 40px;
     --s-12: 48px;
+
+    /* Decorative canvas: light and depth, no pattern.
+       The light sources are anchored below the viewport on purpose. The only
+       text that ever sits directly on the canvas is the page title, which
+       lives at the top, so the top of the canvas stays clean and near-white
+       while the atmosphere builds toward the bottom and edges. */
+    --bg-spill: rgba(255, 255, 255, .95);
+    --bg-glow-brand: rgba(63, 138, 108, .2);
+    --bg-glow-cool: rgba(23, 90, 146, .14);
+    --bg-edge: rgba(47, 109, 85, .16);
+    --bg-road: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900'%3E%3Cdefs%3E%3Cfilter id='b' x='-30%25' y='-30%25' width='160%25' height='160%25'%3E%3CfeGaussianBlur stdDeviation='52'/%3E%3C/filter%3E%3C/defs%3E%3Cg filter='url(%23b)' fill='none' stroke-linecap='round'%3E%3Cpath d='M-140 830C250 830 430 470 790 430S1240 520 1580 190' stroke='%233f8a6c' stroke-width='130' opacity='.42'/%3E%3Cpath d='M-140 900C300 900 480 560 830 520S1270 600 1580 300' stroke='%233f8a6c' stroke-width='30' opacity='.34'/%3E%3C/g%3E%3C/svg%3E");
 
     /* Layout */
     --topbar-h: 64px;
@@ -121,7 +154,7 @@
 
         --text: #e6eeeb;
         --text-2: #b0bfba;
-        --muted: #85948e;
+        --muted: #8d9c96;
 
         --brand: #55a181;
         --brand-strong: #7cc3a4;
@@ -151,10 +184,33 @@
         --muted-fg: #a4b7bf;
         --muted-line: #313c41;
 
+        /* In dark mode the rail has to sit a shade off the page or the edge
+           between nav and content disappears. */
+        --rail-bg: #141b19;
+        --rail-bg-2: #1b2523;
+        --rail-bg-3: #22302c;
+        --rail-border: #26322e;
+        --rail-border-soft: #1e2926;
+        --rail-text: #e6eeeb;
+        --rail-text-2: #b0bfba;
+        --rail-muted: #85948e;
+        --rail-accent: #55a181;
+        --rail-accent-solid: #55a181;
+        --rail-accent-text: #06231a;
+        --rail-inset: rgba(255, 255, 255, .04);
+        --rail-top: #111917;
+        --rail-sheen: linear-gradient(180deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, 0));
+
+        --bg-spill: rgba(255, 255, 255, .035);
+        --bg-glow-brand: rgba(85, 161, 129, .18);
+        --bg-glow-cool: rgba(133, 194, 238, .12);
+        --bg-edge: rgba(85, 161, 129, .15);
+        --bg-road: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900'%3E%3Cdefs%3E%3Cfilter id='b' x='-30%25' y='-30%25' width='160%25' height='160%25'%3E%3CfeGaussianBlur stdDeviation='52'/%3E%3C/filter%3E%3C/defs%3E%3Cg filter='url(%23b)' fill='none' stroke-linecap='round'%3E%3Cpath d='M-140 830C250 830 430 470 790 430S1240 520 1580 190' stroke='%2355a181' stroke-width='130' opacity='.42'/%3E%3Cpath d='M-140 900C300 900 480 560 830 520S1270 600 1580 300' stroke='%2355a181' stroke-width='30' opacity='.34'/%3E%3C/g%3E%3C/svg%3E");
+
         --scrim: rgba(0, 0, 0, .62);
 
         --shadow-xs: 0 1px 2px rgba(0, 0, 0, .45);
-        --shadow-sm: 0 1px 2px rgba(0, 0, 0, .45);
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, .45), 0 4px 12px -4px rgba(0, 0, 0, .6);
         --shadow: 0 2px 6px rgba(0, 0, 0, .4), 0 12px 28px -16px rgba(0, 0, 0, .8);
         --shadow-lg: 0 10px 26px -10px rgba(0, 0, 0, .6), 0 30px 60px -30px rgba(0, 0, 0, .9);
         --shadow-focus: 0 0 0 3px rgba(85, 161, 129, .25);
@@ -178,6 +234,50 @@
 html {
     -webkit-text-size-adjust: 100%;
     background-color: var(--bg);
+}
+
+/* ---------- Decorative canvas ----------
+   Two fixed pseudo-elements sit between the page background and the app
+   shell. Fixed (rather than background-attachment: fixed) keeps this cheap
+   to paint, and pointer-events is off so nothing can ever be intercepted. */
+
+body::before,
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Light. A white spill across the top of the canvas so the page reads as a
+   clean sheet, then two large soft sources anchored off the bottom corners.
+   Anchoring them below the fold keeps the title area free of tint. */
+body::before {
+    background-image:
+        linear-gradient(180deg, var(--bg-spill), rgba(255, 255, 255, 0) 300px),
+        radial-gradient(1500px 940px at -10% 110%, var(--bg-glow-brand), transparent 62%),
+        radial-gradient(1320px 880px at 110% 114%, var(--bg-glow-cool), transparent 60%);
+}
+
+/* Depth. One heavily blurred curve sweeping up through the lower canvas, plus
+   a soft glow hugging the viewport edges so the page has a focal frame.
+   Masked so the curve never reaches the title area. */
+body::after {
+    background-image: var(--bg-road);
+    background-size: 1500px 940px;
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    box-shadow: inset 0 0 160px -46px var(--bg-edge);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 26%, rgba(0, 0, 0, .55) 60%, #000 100%);
+    mask-image: linear-gradient(to bottom, transparent 26%, rgba(0, 0, 0, .55) 60%, #000 100%);
+}
+
+/* Lift the app shell and the auth card above the canvas. */
+.layout,
+.auth__inner {
+    position: relative;
+    z-index: 1;
 }
 
 body {
@@ -301,12 +401,15 @@ time {
     cursor: pointer;
     white-space: nowrap;
     box-shadow: var(--shadow-xs);
+    /* Barely-there top light, enough to give solid buttons some depth */
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, .12), transparent 58%);
     transition: background-color .16s var(--ease), border-color .16s var(--ease),
         box-shadow .16s var(--ease), color .16s var(--ease);
 }
 
 .btn:hover {
     background: var(--brand-hover);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, .16), transparent 58%);
 }
 
 .btn:active {
@@ -624,9 +727,10 @@ time {
     align-items: center;
     gap: var(--s-3);
     padding: 0 var(--s-5);
-    background: color-mix(in srgb, var(--surface) 86%, transparent);
-    backdrop-filter: saturate(180%) blur(14px);
-    border-bottom: 1px solid var(--border);
+    background-color: var(--rail-top);
+    background-image: var(--rail-sheen);
+    border-bottom: 1px solid var(--rail-border);
+    color: var(--rail-text);
 }
 
 .nav-toggle {
@@ -635,16 +739,16 @@ time {
     justify-content: center;
     width: 38px;
     height: 38px;
-    border: 1px solid var(--border-strong);
+    border: 1px solid var(--rail-border);
     border-radius: var(--r-sm);
-    background: var(--surface);
-    color: var(--text-2);
+    background: var(--rail-inset);
+    color: var(--rail-text-2);
     cursor: pointer;
 }
 
 .nav-toggle:hover {
-    color: var(--text);
-    background: var(--surface-2);
+    color: var(--rail-text);
+    background: var(--rail-bg-2);
 }
 
 .brand {
@@ -652,7 +756,7 @@ time {
     align-items: center;
     gap: 10px;
     text-decoration: none;
-    color: var(--text);
+    color: var(--rail-text);
 }
 
 .brand__mark {
@@ -661,9 +765,9 @@ time {
     display: grid;
     place-items: center;
     border-radius: 9px;
-    background: var(--brand);
-    color: var(--on-brand);
-    box-shadow: 0 1px 2px rgba(18, 38, 31, .16);
+    background: var(--rail-accent-solid);
+    color: var(--rail-accent-text);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, .14), 0 2px 8px -3px rgba(0, 0, 0, .55);
 }
 
 .brand__mark .icon {
@@ -695,8 +799,9 @@ time {
     display: grid;
     place-items: center;
     border-radius: 50%;
-    background: var(--brand-soft);
-    color: var(--brand-strong);
+    background: var(--rail-inset);
+    box-shadow: inset 0 0 0 1px var(--rail-border);
+    color: var(--rail-accent);
     font-weight: 700;
     font-size: 14.5px;
     flex: none;
@@ -712,6 +817,7 @@ time {
 .topbar__name {
     font-size: 13.5px;
     font-weight: 600;
+    color: var(--rail-text);
 }
 
 .role-badge {
@@ -758,8 +864,8 @@ time {
     display: flex;
     flex-direction: column;
     padding: var(--s-5) var(--s-3) var(--s-4);
-    background: var(--surface);
-    border-right: 1px solid var(--border);
+    background: var(--rail-bg);
+    border-right: 1px solid var(--rail-border);
     overflow-y: auto;
     overscroll-behavior: contain;
 }
@@ -776,7 +882,7 @@ time {
     font-weight: 700;
     letter-spacing: .1em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--rail-muted);
 }
 
 .side-link {
@@ -786,7 +892,7 @@ time {
     gap: 10px;
     padding: 9px 12px;
     border-radius: var(--r-sm);
-    color: var(--text-2);
+    color: var(--rail-text-2);
     font-size: 14px;
     font-weight: 500;
     text-decoration: none;
@@ -800,40 +906,30 @@ time {
 .side-link .icon {
     width: 17px;
     height: 17px;
-    color: var(--muted);
+    color: var(--rail-muted);
     transition: color .14s var(--ease);
 }
 
 .side-link:hover {
-    background: var(--surface-3);
-    color: var(--text);
+    background: var(--rail-bg-2);
+    color: var(--rail-text);
 }
 
 .side-link:hover .icon {
-    color: var(--text-2);
+    color: var(--rail-text-2);
 }
 
+/* The active section is a solid brand pill: the strongest possible "you are
+   here" signal without resorting to an oversized label. */
 .side-link.is-active {
-    background: var(--brand-soft);
-    color: var(--brand-strong);
+    background: var(--rail-accent);
+    color: var(--rail-accent-text);
     font-weight: 600;
+    box-shadow: 0 1px 2px rgba(20, 45, 35, .18);
 }
 
 .side-link.is-active .icon {
-    color: var(--brand-strong);
-}
-
-/* Accent rail marks the current section without extra weight */
-.side-link.is-active::before {
-    content: "";
-    position: absolute;
-    left: calc(var(--s-3) * -1);
-    top: 50%;
-    transform: translateY(-50%);
-    width: 3px;
-    height: 18px;
-    border-radius: 0 3px 3px 0;
-    background: var(--brand);
+    color: var(--rail-accent-text);
 }
 
 .sidebar__foot {
@@ -846,8 +942,9 @@ time {
     gap: 10px;
     padding: var(--s-3);
     border-radius: var(--r);
-    background: var(--surface-2);
-    border: 1px solid var(--border);
+    background: var(--rail-inset);
+    border: 1px solid var(--rail-border-soft);
+    box-shadow: var(--shadow-xs);
 }
 
 .sidebar__workflow-icon {
@@ -870,11 +967,12 @@ time {
     display: block;
     font-size: 12px;
     font-weight: 650;
+    color: var(--rail-text);
 }
 
 .sidebar__workflow p {
     font-size: 11.5px;
-    color: var(--muted);
+    color: var(--rail-muted);
     line-height: 1.45;
     margin-top: 2px;
 }
@@ -906,7 +1004,7 @@ time {
     flex-wrap: wrap;
     margin-bottom: var(--s-5);
     padding-bottom: var(--s-4);
-    border-bottom: 1px solid var(--border-soft);
+    border-bottom: 1px solid color-mix(in srgb, var(--brand) 20%, var(--border));
 }
 
 .page-title {
@@ -926,13 +1024,13 @@ time {
 .page-count {
     display: inline-block;
     margin-top: 8px;
-    padding: 2px 9px;
+    padding: 2px 10px;
     border-radius: var(--r-full);
-    background: var(--surface-3);
-    border: 1px solid var(--border);
+    background: var(--brand-softer);
+    border: 1px solid color-mix(in srgb, var(--brand) 22%, transparent);
     font-size: 12px;
     font-weight: 600;
-    color: var(--text-2);
+    color: var(--brand-strong);
 }
 
 .page-head__actions {
@@ -979,6 +1077,7 @@ time {
     border-radius: var(--r-sm);
     background: var(--brand-soft);
     color: var(--brand-strong);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brand) 18%, transparent);
 }
 
 .panel__icon .icon {
@@ -1019,6 +1118,7 @@ time {
     border-radius: var(--r);
     background: var(--surface-2);
     border: 1px solid var(--border);
+    border-top: 2px solid var(--brand);
 }
 
 .steps b {
@@ -1049,23 +1149,43 @@ time {
 
 .card {
     position: relative;
+    /* Overridden per metric by the .card--* modifiers below. */
+    --card-accent: transparent;
     display: flex;
     align-items: center;
     gap: var(--s-3);
-    padding: var(--s-4);
+    padding: var(--s-5) var(--s-4) var(--s-4);
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--r-lg);
     box-shadow: var(--shadow-sm);
     color: inherit;
     text-decoration: none;
+    overflow: hidden;
     transition: border-color .16s var(--ease), box-shadow .16s var(--ease),
-        background-color .16s var(--ease);
+        transform .16s var(--ease);
 }
+
+/* Accent edge along the top gives each metric its own colour identity and
+   breaks up what would otherwise be five identical white boxes. */
+.card::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: var(--card-accent, transparent);
+}
+
+.card--brand { --card-accent: var(--brand); }
+.card--warn { --card-accent: #d99a2b; }
+.card--info { --card-accent: #3d84c6; }
+.card--ok { --card-accent: #2f9e63; }
+.card--muted { --card-accent: var(--border-strong); }
 
 a.card:hover {
     border-color: var(--border-strong);
     box-shadow: var(--shadow);
+    transform: translateY(-1px);
 }
 
 a.card:focus-visible {
@@ -1075,13 +1195,14 @@ a.card:focus-visible {
 
 .card__icon {
     flex: none;
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     display: grid;
     place-items: center;
     border-radius: var(--r);
     background: var(--muted-bg);
     color: var(--muted-fg);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 12%, transparent);
 }
 
 .card__icon .icon {
@@ -1154,6 +1275,85 @@ a.card:hover .card__go {
     background: var(--muted-bg);
     color: var(--muted-fg);
 }
+
+/* ---------- Fleet status distribution ---------- */
+
+.mix {
+    display: flex;
+    gap: 3px;
+    height: 14px;
+    margin-top: var(--s-4);
+    padding: 3px;
+    border-radius: var(--r-full);
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+}
+
+.mix__seg {
+    display: block;
+    /* No min-width: a status with a count of zero must occupy no space,
+       otherwise the bar implies work that is not there. */
+    flex-basis: 0;
+    border-radius: var(--r-full);
+    transition: flex-grow .4s var(--ease);
+}
+
+.mix__seg--pending {
+    background: var(--pending-fg);
+}
+
+.mix__seg--in-maintenance {
+    background: var(--active-fg);
+}
+
+.mix__seg--completed {
+    background: var(--ok-fg);
+}
+
+.mix__seg--cancelled {
+    background: var(--muted-fg);
+}
+
+.mix__legend {
+    list-style: none;
+    padding: 0;
+    margin: var(--s-4) 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-6);
+}
+
+.mix__key {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    color: var(--text-2);
+}
+
+.mix__key strong {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.mix__pct {
+    color: var(--muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+.mix__dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 3px;
+    flex: none;
+}
+
+.mix__dot--pending { background: var(--pending-fg); }
+.mix__dot--in-maintenance { background: var(--active-fg); }
+.mix__dot--completed { background: var(--ok-fg); }
+.mix__dot--cancelled { background: var(--muted-fg); }
 
 /* ==========================================================================
    8. FORMS
@@ -1464,14 +1664,14 @@ thead th {
     position: sticky;
     top: 0;
     z-index: 1;
-    background: var(--surface-2);
+    background: var(--brand-softer);
     font-size: 11px;
     font-weight: 700;
     letter-spacing: .07em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--brand-strong);
     white-space: nowrap;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid color-mix(in srgb, var(--brand) 22%, var(--border));
 }
 
 tbody tr {
@@ -1479,7 +1679,7 @@ tbody tr {
 }
 
 tbody tr:hover {
-    background: var(--surface-2);
+    background: var(--brand-softer);
 }
 
 tbody tr:last-child td {
@@ -1648,8 +1848,8 @@ tr.is-highlight {
     padding: var(--s-4);
     margin-bottom: var(--s-5);
     border-radius: var(--r);
-    background: var(--surface-inset);
-    border: 1px solid var(--border);
+    background: var(--brand-softer);
+    border: 1px solid color-mix(in srgb, var(--brand) 16%, var(--border));
 }
 
 .truck-strip__cell > span {
@@ -1798,10 +1998,15 @@ tr.is-highlight {
 }
 
 .empty .icon {
-    width: 32px;
-    height: 32px;
-    margin: 0 auto var(--s-3);
-    opacity: .55;
+    width: 48px;
+    height: 48px;
+    padding: 13px;
+    margin: 0 auto var(--s-4);
+    border-radius: 50%;
+    background: var(--brand-softer);
+    border: 1px solid color-mix(in srgb, var(--brand) 20%, transparent);
+    color: var(--brand);
+    opacity: 1;
 }
 
 .empty strong {
@@ -2041,6 +2246,17 @@ tr.is-highlight {
 
     .form-actions .btn {
         flex: 1 1 auto;
+    }
+}
+
+/* Without mask support the curve simply reaches a little higher, which
+   still reads as atmosphere, so nothing here is load-bearing. */
+@supports not ((-webkit-mask-image: linear-gradient(#000, #000)) or
+    (mask-image: linear-gradient(#000, #000))) {
+
+    body::after {
+        -webkit-mask-image: none;
+        mask-image: none;
     }
 }
 

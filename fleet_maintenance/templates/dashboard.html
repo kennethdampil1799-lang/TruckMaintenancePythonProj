@@ -28,6 +28,8 @@
 {% block content %}
 
 {% set is_driver = session['role'] == 'driver' %}
+{# Derived in the template so the route stays untouched. #}
+{% set total_requests = pending_requests + maintenance_count + completed_count + cancelled_count %}
 
 <div class="cards">
 
@@ -101,6 +103,80 @@
     </a>
 
 </div>
+
+<section class="panel">
+
+    <div class="panel__head">
+        <span class="panel__icon">
+            <svg class="icon" aria-hidden="true"><use href="#i-clipboard"></use></svg>
+        </span>
+        <h3>Where the work stands</h3>
+    </div>
+
+    {% if total_requests %}
+
+        <p>
+            {{ total_requests }}
+            {{ 'request' if total_requests == 1 else 'requests' }} by current status.
+            The bar shows the share each one represents.
+        </p>
+
+        {# Decorative: the legend below carries the same figures as real text. #}
+        <div class="mix" aria-hidden="true">
+            <span class="mix__seg mix__seg--pending" style="flex-grow: {{ pending_requests }}"></span>
+            <span class="mix__seg mix__seg--in-maintenance" style="flex-grow: {{ maintenance_count }}"></span>
+            <span class="mix__seg mix__seg--completed" style="flex-grow: {{ completed_count }}"></span>
+            <span class="mix__seg mix__seg--cancelled" style="flex-grow: {{ cancelled_count }}"></span>
+        </div>
+
+        <ul class="mix__legend">
+            <li class="mix__key">
+                <span class="mix__dot mix__dot--pending"></span>
+                Pending
+                <strong>{{ pending_requests }}</strong>
+                <span class="mix__pct">{{ ((pending_requests / total_requests) * 100)|round(0)|int }}%</span>
+            </li>
+            <li class="mix__key">
+                <span class="mix__dot mix__dot--in-maintenance"></span>
+                In maintenance
+                <strong>{{ maintenance_count }}</strong>
+                <span class="mix__pct">{{ ((maintenance_count / total_requests) * 100)|round(0)|int }}%</span>
+            </li>
+            <li class="mix__key">
+                <span class="mix__dot mix__dot--completed"></span>
+                Completed
+                <strong>{{ completed_count }}</strong>
+                <span class="mix__pct">{{ ((completed_count / total_requests) * 100)|round(0)|int }}%</span>
+            </li>
+            <li class="mix__key">
+                <span class="mix__dot mix__dot--cancelled"></span>
+                Cancelled
+                <strong>{{ cancelled_count }}</strong>
+                <span class="mix__pct">{{ ((cancelled_count / total_requests) * 100)|round(0)|int }}%</span>
+            </li>
+        </ul>
+
+    {% else %}
+
+        <p>No maintenance requests have been filed yet.</p>
+
+        <div class="empty">
+            <svg class="icon" aria-hidden="true"><use href="#i-check-badge"></use></svg>
+            <strong>Nothing in the queue</strong>
+            <p>
+                {% if is_driver %}
+                    When you submit an inspection request it will appear here,
+                    broken down by status.
+                {% else %}
+                    Requests submitted by drivers will show up here, broken
+                    down by status.
+                {% endif %}
+            </p>
+        </div>
+
+    {% endif %}
+
+</section>
 
 {% if is_driver and receipts %}
 
