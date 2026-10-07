@@ -86,8 +86,15 @@
     --rail-accent-solid: #2f6d55;
     --rail-accent-text: #ffffff;
     --rail-inset: rgba(255, 255, 255, .78);
+    --rail-active-bg: #d3e8dc;
+    --rail-hairline: rgba(47, 109, 85, .16);
     --rail-top: #ffffff;
     --rail-sheen: linear-gradient(180deg, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0));
+
+    /* A 1px light line along the top edge of a raised surface. Invisible on
+       white, which is exactly why dark mode gets the most from it. */
+    --surface-sheen: rgba(255, 255, 255, .9);
+    --rail-depth: linear-gradient(180deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 220px);
 
     --scrim: rgba(14, 32, 26, .42);
 
@@ -102,10 +109,10 @@
 
     /* Radii */
     --r-xs: 6px;
-    --r-sm: 8px;
-    --r: 10px;
-    --r-lg: 14px;
-    --r-xl: 18px;
+    --r-sm: 9px;
+    --r: 11px;
+    --r-lg: 16px;
+    --r-xl: 20px;
     --r-full: 999px;
 
     /* Spacing scale */
@@ -127,12 +134,14 @@
     --bg-spill: rgba(255, 255, 255, .95);
     --bg-glow-brand: rgba(63, 138, 108, .2);
     --bg-glow-cool: rgba(23, 90, 146, .14);
+    --bg-glow-mint: rgba(78, 176, 138, .09);
     --bg-edge: rgba(47, 109, 85, .16);
-    --bg-road: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900'%3E%3Cdefs%3E%3Cfilter id='b' x='-30%25' y='-30%25' width='160%25' height='160%25'%3E%3CfeGaussianBlur stdDeviation='52'/%3E%3C/filter%3E%3C/defs%3E%3Cg filter='url(%23b)' fill='none' stroke-linecap='round'%3E%3Cpath d='M-140 830C250 830 430 470 790 430S1240 520 1580 190' stroke='%233f8a6c' stroke-width='130' opacity='.42'/%3E%3Cpath d='M-140 900C300 900 480 560 830 520S1270 600 1580 300' stroke='%233f8a6c' stroke-width='30' opacity='.34'/%3E%3C/g%3E%3C/svg%3E");
+    --bg-mechanic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 560'%3E%3Cdefs%3E%3ClinearGradient id='f' x1='0' y1='0' x2='.35' y2='1'%3E%3Cstop offset='0' stop-color='%23fff' stop-opacity='0'/%3E%3Cstop offset='.2' stop-color='%23fff' stop-opacity='.5'/%3E%3Cstop offset='.55' stop-color='%23fff' stop-opacity='1'/%3E%3Cstop offset='1' stop-color='%23fff' stop-opacity='1'/%3E%3C/linearGradient%3E%3Cmask id='m'%3E%3Crect width='420' height='560' fill='url(%23f)'/%3E%3C/mask%3E%3Cfilter id='b' x='-45%25' y='-45%25' width='190%25' height='190%25'%3E%3CfeGaussianBlur stdDeviation='22'/%3E%3C/filter%3E%3C/defs%3E%3Cg mask='url(%23m)'%3E%3Ccircle cx='210' cy='300' r='205' fill='%232a4a3f' opacity='.5'/%3E%3Ccircle cx='210' cy='300' r='142' fill='%232f5449' opacity='.45'/%3E%3C/g%3E%3Cg mask='url(%23m)' filter='url(%23b)' opacity='.34' fill='%232f5449'%3E%3Cpath d='M54 560C57 462 100 400 158 374L186 364h48l28 10c58 26 101 88 104 186Z'/%3E%3Cellipse cx='210' cy='250' rx='62' ry='68'/%3E%3C/g%3E%3Cg mask='url(%23m)' opacity='.62'%3E%3Cpath d='M54 560C57 462 100 400 158 374L186 364h48l28 10c58 26 101 88 104 186Z' fill='%232f5449'/%3E%3Cpath d='M158 374l28-10h48l28 10c-16 9-28 21-36 38h-32c-8-17-20-29-36-38Z' fill='%233d6a5a'/%3E%3Cpath d='M118 442h60' stroke='%2324403a' stroke-width='7' stroke-linecap='round' fill='none'/%3E%3Cpath d='M186 364l24 32 24-32 19 11-43 48-43-48Z' fill='%2324403a'/%3E%3Crect x='192' y='304' width='36' height='64' rx='17' fill='%2324403a'/%3E%3Cellipse cx='210' cy='250' rx='62' ry='68' fill='%232f5449'/%3E%3Ccircle cx='150' cy='258' r='10' fill='%232f5449'/%3E%3Ccircle cx='270' cy='258' r='10' fill='%232f5449'/%3E%3Cpath d='M148 236C148 178 174 150 210 150s62 28 62 86Z' fill='%233d6a5a'/%3E%3Cpath d='M146 226c30 16 98 16 128 0l5 19c-34 18-104 18-138 0Z' fill='%2324403a'/%3E%3Cellipse cx='188' cy='266' rx='6' ry='7' fill='%236fae95'/%3E%3Cellipse cx='232' cy='266' rx='6' ry='7' fill='%236fae95'/%3E%3Cpath d='M190 296c12 11 28 11 40 0' stroke='%236fae95' stroke-width='5.5' fill='none' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E");
+    --bg-road: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900'%3E%3Cdefs%3E%3ClinearGradient id='r' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fff' stop-opacity='0'/%3E%3Cstop offset='.3' stop-color='%23fff' stop-opacity='.45'/%3E%3Cstop offset='.7' stop-color='%23fff' stop-opacity='1'/%3E%3C/linearGradient%3E%3Cmask id='k'%3E%3Crect width='1440' height='900' fill='url(%23r)'/%3E%3C/mask%3E%3Cfilter id='b' x='-30%25' y='-30%25' width='160%25' height='160%25'%3E%3CfeGaussianBlur stdDeviation='52'/%3E%3C/filter%3E%3C/defs%3E%3Cg mask='url(%23k)'%3E%3Cg filter='url(%23b)' fill='none' stroke-linecap='round'%3E%3Cpath d='M-140 830C250 830 430 470 790 430S1240 520 1580 190' stroke='%233f8a6c' stroke-width='130' opacity='.42'/%3E%3Cpath d='M-140 900C300 900 480 560 830 520S1270 600 1580 300' stroke='%233f8a6c' stroke-width='30' opacity='.34'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 
     /* Layout */
     --topbar-h: 64px;
-    --sidebar-w: 258px;
+    --sidebar-w: 270px;
     --page-max: 1400px;
     --measure: 68ch;
 
@@ -141,16 +150,16 @@
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --bg: #0f1413;
-        --bg-accent: #0a0f0e;
-        --surface: #161d1b;
-        --surface-2: #1b2422;
-        --surface-3: #222c29;
-        --surface-inset: #131a19;
+        --bg: #0d1311;
+        --bg-accent: #080c0b;
+        --surface: #171f1d;
+        --surface-2: #1d2624;
+        --surface-3: #242e2b;
+        --surface-inset: #141b19;
 
-        --border: #27322f;
-        --border-soft: #1f2826;
-        --border-strong: #37443f;
+        --border: #2a3633;
+        --border-soft: #222c29;
+        --border-strong: #3b4944;
 
         --text: #e6eeeb;
         --text-2: #b0bfba;
@@ -197,15 +206,21 @@
         --rail-accent: #55a181;
         --rail-accent-solid: #55a181;
         --rail-accent-text: #06231a;
-        --rail-inset: rgba(255, 255, 255, .04);
-        --rail-top: #111917;
-        --rail-sheen: linear-gradient(180deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, 0));
+        --rail-inset: rgba(255, 255, 255, .045);
+        --rail-active-bg: #1d382e;
+        --rail-hairline: rgba(255, 255, 255, .07);
+        --rail-top: #101614;
+        --rail-sheen: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, 0));
+        --surface-sheen: rgba(255, 255, 255, .055);
+        --rail-depth: linear-gradient(180deg, rgba(255, 255, 255, .035), rgba(255, 255, 255, 0) 240px);
 
         --bg-spill: rgba(255, 255, 255, .035);
-        --bg-glow-brand: rgba(85, 161, 129, .18);
-        --bg-glow-cool: rgba(133, 194, 238, .12);
+        --bg-glow-brand: rgba(85, 161, 129, .2);
+        --bg-glow-cool: rgba(133, 194, 238, .13);
+        --bg-glow-mint: rgba(85, 161, 129, .1);
         --bg-edge: rgba(85, 161, 129, .15);
-        --bg-road: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900'%3E%3Cdefs%3E%3Cfilter id='b' x='-30%25' y='-30%25' width='160%25' height='160%25'%3E%3CfeGaussianBlur stdDeviation='52'/%3E%3C/filter%3E%3C/defs%3E%3Cg filter='url(%23b)' fill='none' stroke-linecap='round'%3E%3Cpath d='M-140 830C250 830 430 470 790 430S1240 520 1580 190' stroke='%2355a181' stroke-width='130' opacity='.42'/%3E%3Cpath d='M-140 900C300 900 480 560 830 520S1270 600 1580 300' stroke='%2355a181' stroke-width='30' opacity='.34'/%3E%3C/g%3E%3C/svg%3E");
+        --bg-mechanic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 560'%3E%3Cdefs%3E%3ClinearGradient id='f' x1='0' y1='0' x2='.35' y2='1'%3E%3Cstop offset='0' stop-color='%23fff' stop-opacity='0'/%3E%3Cstop offset='.2' stop-color='%23fff' stop-opacity='.5'/%3E%3Cstop offset='.55' stop-color='%23fff' stop-opacity='1'/%3E%3Cstop offset='1' stop-color='%23fff' stop-opacity='1'/%3E%3C/linearGradient%3E%3Cmask id='m'%3E%3Crect width='420' height='560' fill='url(%23f)'/%3E%3C/mask%3E%3Cfilter id='b' x='-45%25' y='-45%25' width='190%25' height='190%25'%3E%3CfeGaussianBlur stdDeviation='22'/%3E%3C/filter%3E%3C/defs%3E%3Cg mask='url(%23m)'%3E%3Ccircle cx='210' cy='300' r='205' fill='%232a4a3f' opacity='.5'/%3E%3Ccircle cx='210' cy='300' r='142' fill='%232f5449' opacity='.45'/%3E%3C/g%3E%3Cg mask='url(%23m)' filter='url(%23b)' opacity='.34' fill='%232f5449'%3E%3Cpath d='M54 560C57 462 100 400 158 374L186 364h48l28 10c58 26 101 88 104 186Z'/%3E%3Cellipse cx='210' cy='250' rx='62' ry='68'/%3E%3C/g%3E%3Cg mask='url(%23m)' opacity='.62'%3E%3Cpath d='M54 560C57 462 100 400 158 374L186 364h48l28 10c58 26 101 88 104 186Z' fill='%232f5449'/%3E%3Cpath d='M158 374l28-10h48l28 10c-16 9-28 21-36 38h-32c-8-17-20-29-36-38Z' fill='%233d6a5a'/%3E%3Cpath d='M118 442h60' stroke='%2324403a' stroke-width='7' stroke-linecap='round' fill='none'/%3E%3Cpath d='M186 364l24 32 24-32 19 11-43 48-43-48Z' fill='%2324403a'/%3E%3Crect x='192' y='304' width='36' height='64' rx='17' fill='%2324403a'/%3E%3Cellipse cx='210' cy='250' rx='62' ry='68' fill='%232f5449'/%3E%3Ccircle cx='150' cy='258' r='10' fill='%232f5449'/%3E%3Ccircle cx='270' cy='258' r='10' fill='%232f5449'/%3E%3Cpath d='M148 236C148 178 174 150 210 150s62 28 62 86Z' fill='%233d6a5a'/%3E%3Cpath d='M146 226c30 16 98 16 128 0l5 19c-34 18-104 18-138 0Z' fill='%2324403a'/%3E%3Cellipse cx='188' cy='266' rx='6' ry='7' fill='%236fae95'/%3E%3Cellipse cx='232' cy='266' rx='6' ry='7' fill='%236fae95'/%3E%3Cpath d='M190 296c12 11 28 11 40 0' stroke='%236fae95' stroke-width='5.5' fill='none' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E");
+        --bg-road: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 900'%3E%3Cdefs%3E%3ClinearGradient id='r' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fff' stop-opacity='0'/%3E%3Cstop offset='.3' stop-color='%23fff' stop-opacity='.45'/%3E%3Cstop offset='.7' stop-color='%23fff' stop-opacity='1'/%3E%3C/linearGradient%3E%3Cmask id='k'%3E%3Crect width='1440' height='900' fill='url(%23r)'/%3E%3C/mask%3E%3Cfilter id='b' x='-30%25' y='-30%25' width='160%25' height='160%25'%3E%3CfeGaussianBlur stdDeviation='52'/%3E%3C/filter%3E%3C/defs%3E%3Cg mask='url(%23k)'%3E%3Cg filter='url(%23b)' fill='none' stroke-linecap='round'%3E%3Cpath d='M-140 830C250 830 430 470 790 430S1240 520 1580 190' stroke='%2355a181' stroke-width='130' opacity='.42'/%3E%3Cpath d='M-140 900C300 900 480 560 830 520S1270 600 1580 300' stroke='%2355a181' stroke-width='30' opacity='.34'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 
         --scrim: rgba(0, 0, 0, .62);
 
@@ -257,20 +272,27 @@ body::before {
     background-image:
         linear-gradient(180deg, var(--bg-spill), rgba(255, 255, 255, 0) 300px),
         radial-gradient(1500px 940px at -10% 110%, var(--bg-glow-brand), transparent 62%),
-        radial-gradient(1320px 880px at 110% 114%, var(--bg-glow-cool), transparent 60%);
+        radial-gradient(1320px 880px at 110% 114%, var(--bg-glow-cool), transparent 60%),
+        /* Third source sits lowest of all, so it only layers into the very
+           bottom of the frame and never touches the title band. */
+        radial-gradient(1040px 680px at 46% 124%, var(--bg-glow-mint), transparent 64%);
 }
 
-/* Depth. One heavily blurred curve sweeping up through the lower canvas, plus
-   a soft glow hugging the viewport edges so the page has a focal frame.
-   Masked so the curve never reaches the title area. */
+/* Depth and character: the technician illustration sits in front, the blurred
+   road curve behind it, and a soft glow hugs the viewport edges as a frame.
+   Both SVGs carry their own fade, so no CSS mask is needed here. */
 body::after {
-    background-image: var(--bg-road);
-    background-size: 1500px 940px;
-    background-position: center bottom;
-    background-repeat: no-repeat;
+    /* Figure first so it reads in front of the road curve; the curve is a
+       soft blur, so it still sits over it atmospherically. */
+    background-image:
+        var(--bg-mechanic),
+        var(--bg-road);
+    /* Bleeds off the right edge and below the fold, so the figure is a
+       background presence rather than something sitting in the content. */
+    background-size: 430px 574px, 1500px 940px;
+    background-position: right -78px bottom -96px, center bottom;
+    background-repeat: no-repeat, no-repeat;
     box-shadow: inset 0 0 160px -46px var(--bg-edge);
-    -webkit-mask-image: linear-gradient(to bottom, transparent 26%, rgba(0, 0, 0, .55) 60%, #000 100%);
-    mask-image: linear-gradient(to bottom, transparent 26%, rgba(0, 0, 0, .55) 60%, #000 100%);
 }
 
 /* Lift the app shell and the auth card above the canvas. */
@@ -400,9 +422,9 @@ time {
     text-decoration: none;
     cursor: pointer;
     white-space: nowrap;
-    box-shadow: var(--shadow-xs);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14), var(--shadow-xs);
     /* Barely-there top light, enough to give solid buttons some depth */
-    background-image: linear-gradient(180deg, rgba(255, 255, 255, .12), transparent 58%);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, .16), transparent 62%);
     transition: background-color .16s var(--ease), border-color .16s var(--ease),
         box-shadow .16s var(--ease), color .16s var(--ease);
 }
@@ -437,7 +459,7 @@ time {
     background: var(--surface);
     color: var(--text-2);
     border-color: var(--border-strong);
-    box-shadow: var(--shadow-xs);
+    box-shadow: inset 0 1px 0 var(--surface-sheen), var(--shadow-xs);
 }
 
 .btn--ghost:hover {
@@ -568,13 +590,14 @@ time {
     gap: var(--s-4);
 }
 
+/* Matches the in-app wordmark so the brand reads the same on both. */
 .auth__brand {
     display: flex;
     align-items: center;
     gap: var(--s-3);
-    font-size: 16px;
-    font-weight: 700;
-    letter-spacing: -.01em;
+    font-size: 19px;
+    font-weight: 650;
+    letter-spacing: -.022em;
 }
 
 .auth__mark {
@@ -760,30 +783,32 @@ time {
 }
 
 .brand__mark {
-    width: 34px;
-    height: 34px;
+    width: 38px;
+    height: 38px;
     display: grid;
     place-items: center;
-    border-radius: 9px;
+    border-radius: 10px;
     background: var(--rail-accent-solid);
     color: var(--rail-accent-text);
     box-shadow: 0 0 0 1px rgba(255, 255, 255, .14), 0 2px 8px -3px rgba(0, 0, 0, .55);
 }
 
 .brand__mark .icon {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
 }
 
+/* Wordmark. Needs real weight, not just size: 500 reads as thin body text
+   and disappears next to the logo tile. */
 .brand__text {
-    font-size: 16px;
-    font-weight: 500;
-    letter-spacing: -.015em;
+    font-size: 19px;
+    font-weight: 650;
+    letter-spacing: -.022em;
     white-space: nowrap;
 }
 
 .brand__text strong {
-    font-weight: 700;
+    font-weight: 780;
 }
 
 .topbar__user {
@@ -863,51 +888,95 @@ time {
     height: calc(100vh - var(--topbar-h));
     display: flex;
     flex-direction: column;
-    padding: var(--s-5) var(--s-3) var(--s-4);
-    background: var(--rail-bg);
+    /* 16px of left padding gives the active-state accent bar somewhere to
+       live, flush against the rail edge, without crowding the labels. */
+    padding: var(--s-6) var(--s-4) var(--s-5) 16px;
+    background-color: var(--rail-bg);
+    background-image: var(--rail-depth);
     border-right: 1px solid var(--rail-border);
+    /* The rail reads as sitting slightly above the canvas. */
+    box-shadow: 14px 0 32px -30px rgba(10, 24, 20, .45);
     overflow-y: auto;
     overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--rail-accent) 32%, transparent) transparent;
 }
 
+.sidebar::-webkit-scrollbar {
+    width: 9px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--rail-accent) 32%, transparent);
+    border: 3px solid transparent;
+    border-radius: var(--r-full);
+    background-clip: content-box;
+}
+
+/* A hairline between sections gives the nav a document-like structure
+   instead of one undifferentiated stack of links. */
 .nav-group + .nav-group {
     margin-top: var(--s-5);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--rail-hairline);
 }
 
 .sidebar__label,
 .nav-group__label {
-    display: block;
-    padding: 0 12px 7px;
-    font-size: 10.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px 9px;
+    font-size: 10px;
     font-weight: 700;
-    letter-spacing: .1em;
+    letter-spacing: .14em;
     text-transform: uppercase;
     color: var(--rail-muted);
+}
+
+/* Small green tick marks each section, so the label reads as a heading
+   rather than as another grey line of text. */
+.sidebar__label::before,
+.nav-group__label::before {
+    content: "";
+    width: 2px;
+    height: 10px;
+    border-radius: 2px;
+    background: var(--rail-accent);
+    opacity: .5;
+    flex: none;
 }
 
 .side-link {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 9px 12px;
-    border-radius: var(--r-sm);
+    gap: 11px;
+    padding: 10px 12px;
+    border-radius: var(--r);
     color: var(--rail-text-2);
     font-size: 14px;
     font-weight: 500;
+    letter-spacing: -.005em;
     text-decoration: none;
-    transition: background-color .14s var(--ease), color .14s var(--ease);
+    transition: background-color .16s var(--ease), color .16s var(--ease);
 }
 
 .side-link + .side-link {
-    margin-top: 2px;
+    margin-top: 3px;
 }
 
+/* Fixed-size icon column keeps every label on the same left edge. */
 .side-link .icon {
-    width: 17px;
-    height: 17px;
+    flex: none;
+    width: 18px;
+    height: 18px;
     color: var(--rail-muted);
-    transition: color .14s var(--ease);
+    transition: color .16s var(--ease);
 }
 
 .side-link:hover {
@@ -919,17 +988,50 @@ time {
     color: var(--rail-text-2);
 }
 
-/* The active section is a solid brand pill: the strongest possible "you are
-   here" signal without resorting to an oversized label. */
-.side-link.is-active {
+/* Accent bar on the rail edge. It whispers on hover and locks on for the
+   current page, so the eye learns one position to look at. */
+.side-link::before {
+    content: "";
+    position: absolute;
+    left: -16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 0;
+    border-radius: 0 3px 3px 0;
     background: var(--rail-accent);
-    color: var(--rail-accent-text);
-    font-weight: 600;
-    box-shadow: 0 1px 2px rgba(20, 45, 35, .18);
+    opacity: 0;
+    transition: height .18s var(--ease), opacity .18s var(--ease);
+}
+
+.side-link:hover::before {
+    height: 16px;
+    opacity: .38;
+}
+
+/* Active state: a brand-tinted row with a solid accent bar, brighter label
+   and icon. Deliberately not a filled pill - that reads as a button rather
+   than as "you are here". */
+.side-link.is-active {
+    background: var(--rail-active-bg);
+    color: var(--brand-strong);
+    font-weight: 650;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
 }
 
 .side-link.is-active .icon {
-    color: var(--rail-accent-text);
+    color: var(--rail-accent);
+}
+
+.side-link.is-active::before {
+    height: 22px;
+    opacity: 1;
+    box-shadow: 0 0 12px color-mix(in srgb, var(--rail-accent) 60%, transparent);
+}
+
+.side-link:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--rail-bg), 0 0 0 4px var(--rail-accent);
 }
 
 .sidebar__foot {
@@ -937,25 +1039,35 @@ time {
     padding-top: var(--s-5);
 }
 
+/* Separates the reference card from the navigation above it. */
+.sidebar__foot::before {
+    content: "";
+    display: block;
+    height: 1px;
+    margin-bottom: var(--s-4);
+    background: var(--rail-hairline);
+}
+
 .sidebar__workflow {
     display: flex;
-    gap: 10px;
-    padding: var(--s-3);
+    gap: 11px;
+    padding: var(--s-4) var(--s-3);
     border-radius: var(--r);
     background: var(--rail-inset);
     border: 1px solid var(--rail-border-soft);
-    box-shadow: var(--shadow-xs);
+    box-shadow: var(--shadow-xs), inset 0 1px 0 var(--surface-sheen);
 }
 
 .sidebar__workflow-icon {
     flex: none;
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     display: grid;
     place-items: center;
-    border-radius: var(--r-xs);
+    border-radius: var(--r-sm);
     background: var(--brand-soft);
     color: var(--brand-strong);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brand) 20%, transparent);
 }
 
 .sidebar__workflow-icon .icon {
@@ -965,16 +1077,18 @@ time {
 
 .sidebar__workflow strong {
     display: block;
-    font-size: 12px;
-    font-weight: 650;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
     color: var(--rail-text);
 }
 
 .sidebar__workflow p {
-    font-size: 11.5px;
+    font-size: 12px;
     color: var(--rail-muted);
-    line-height: 1.45;
-    margin-top: 2px;
+    line-height: 1.5;
+    margin-top: 4px;
 }
 
 .scrim {
@@ -1008,9 +1122,9 @@ time {
 }
 
 .page-title {
-    font-size: 24px;
+    font-size: 25px;
     font-weight: 700;
-    letter-spacing: -.025em;
+    letter-spacing: -.03em;
 }
 
 .page-sub {
@@ -1049,7 +1163,7 @@ time {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--r-lg);
-    box-shadow: var(--shadow-sm);
+    box-shadow: inset 0 1px 0 var(--surface-sheen), var(--shadow-sm);
 }
 
 .panel + .panel,
@@ -1118,17 +1232,21 @@ time {
     border-radius: var(--r);
     background: var(--surface-2);
     border: 1px solid var(--border);
-    border-top: 2px solid var(--brand);
+    box-shadow: inset 0 1px 0 var(--surface-sheen);
 }
 
 .steps b {
-    display: block;
-    font-size: 11px;
+    display: inline-block;
+    padding: 2px 9px 3px;
+    border-radius: var(--r-full);
+    background: var(--brand-soft);
+    border: 1px solid color-mix(in srgb, var(--brand) 22%, transparent);
+    font-size: 10.5px;
     font-weight: 700;
-    letter-spacing: .07em;
+    letter-spacing: .08em;
     text-transform: uppercase;
     color: var(--brand-strong);
-    margin-bottom: 5px;
+    margin-bottom: 9px;
 }
 
 .steps p {
@@ -1158,7 +1276,7 @@ time {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--r-lg);
-    box-shadow: var(--shadow-sm);
+    box-shadow: inset 0 1px 0 var(--surface-sheen), var(--shadow-sm);
     color: inherit;
     text-decoration: none;
     overflow: hidden;
@@ -1184,8 +1302,9 @@ time {
 
 a.card:hover {
     border-color: var(--border-strong);
-    box-shadow: var(--shadow);
-    transform: translateY(-1px);
+    box-shadow: inset 0 1px 0 var(--surface-sheen), var(--shadow),
+        0 14px 30px -18px var(--card-accent, transparent);
+    transform: translateY(-2px);
 }
 
 a.card:focus-visible {
@@ -1216,19 +1335,19 @@ a.card:focus-visible {
 
 .card__text span {
     display: block;
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 11.5px;
+    font-weight: 600;
     color: var(--muted);
-    letter-spacing: -.005em;
+    letter-spacing: .01em;
 }
 
 .card__text strong {
     display: block;
-    margin-top: 1px;
-    font-size: 25px;
+    margin-top: 2px;
+    font-size: 26px;
     font-weight: 700;
-    letter-spacing: -.03em;
-    line-height: 1.15;
+    letter-spacing: -.035em;
+    line-height: 1.12;
 }
 
 /* Chevron hints that a card drills into the filtered request list */
@@ -1557,7 +1676,7 @@ input[type="file"]::file-selector-button:hover {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--r-lg);
-    box-shadow: var(--shadow-sm);
+    box-shadow: inset 0 1px 0 var(--surface-sheen), var(--shadow-sm);
     overflow: hidden;
 }
 
@@ -1665,9 +1784,9 @@ thead th {
     top: 0;
     z-index: 1;
     background: var(--brand-softer);
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 700;
-    letter-spacing: .07em;
+    letter-spacing: .09em;
     text-transform: uppercase;
     color: var(--brand-strong);
     white-space: nowrap;
@@ -1795,13 +1914,14 @@ tr.is-highlight {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 3px 10px 3px 8px;
+    padding: 3px 11px 3px 9px;
     border-radius: var(--r-full);
     border: 1px solid transparent;
     font-size: 12px;
     font-weight: 600;
     letter-spacing: -.005em;
     white-space: nowrap;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
 }
 
 .status::before {
@@ -1850,13 +1970,14 @@ tr.is-highlight {
     border-radius: var(--r);
     background: var(--brand-softer);
     border: 1px solid color-mix(in srgb, var(--brand) 16%, var(--border));
+    box-shadow: inset 0 1px 0 var(--surface-sheen);
 }
 
 .truck-strip__cell > span {
     display: block;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: .07em;
+    font-size: 10.5px;
+    font-weight: 650;
+    letter-spacing: .1em;
     text-transform: uppercase;
     color: var(--muted);
     margin-bottom: 3px;
@@ -2128,6 +2249,13 @@ tr.is-highlight {
 
 @media (max-width: 860px) {
 
+    /* No side gutter to sit in, so the figure would only ever be a sliver
+       behind cards. Drop it rather than leave a cropped fragment. */
+    body::after {
+        background-image: var(--bg-road);
+        background-size: 1100px 700px;
+    }
+
     .nav-toggle {
         display: inline-flex;
     }
@@ -2246,17 +2374,6 @@ tr.is-highlight {
 
     .form-actions .btn {
         flex: 1 1 auto;
-    }
-}
-
-/* Without mask support the curve simply reaches a little higher, which
-   still reads as atmosphere, so nothing here is load-bearing. */
-@supports not ((-webkit-mask-image: linear-gradient(#000, #000)) or
-    (mask-image: linear-gradient(#000, #000))) {
-
-    body::after {
-        -webkit-mask-image: none;
-        mask-image: none;
     }
 }
 
